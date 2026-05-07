@@ -1,29 +1,29 @@
-# SharedCache 跨页面共享缓存
+# SharedCache Cross-Page Shared Cache
 
-## 适用场景
+## Use Cases
 
-| 场景 | 说明 |
-|------|------|
-| 跨页面数据传递 | A 页面选择门店，B 页面使用 |
-| 临时数据缓存 | 接口数据多页面复用，避免重复请求 |
-| 流程状态共享 | 下单流程多页面共享订单草稿 |
-| 非响应式数据 | 纯数据存储，不需触发视图更新 |
+| Scenario | Description |
+|----------|-------------|
+| Cross-page data passing | Page A selects a store, Page B uses it |
+| Temporary data caching | API data reused across pages, avoid duplicate requests |
+| Flow state sharing | Order flow shares order draft across multiple pages |
+| Non-reactive data | Pure data storage, no need to trigger view updates |
 
-**对比其他方案**：比 Vuex 轻量（纯数据缓存）、比 Storage 快（无序列化）、比 globalData 规范（模块化 + watch）。
+**Compared to other solutions**: Lighter than Vuex (pure data cache), faster than Storage (no serialization), more structured than globalData (modular + watch).
 
-## 核心特性
+## Core Features
 
-- 模块化定义，类似 Pinia 的 API 设计
-- 全局单例，跨页面共享同一份数据
-- 支持 watch 监听数据变化
-- 纯 JS 实现，不依赖 Vue 响应式系统
-- 支持直接赋值触发 watch（Proxy 实现）
+- Modular definition, API design similar to Pinia
+- Global singleton, same data shared across pages
+- Supports watch for monitoring data changes
+- Pure JS implementation, no Vue reactivity dependency
+- Supports direct assignment to trigger watch (Proxy implementation)
 
-## 使用方式
+## Usage
 
-### 1. 定义缓存模块
+### 1. Define Cache Module
 
-在 `common/sharedCache/modules/` 下创建模块文件：
+Create module files under `common/sharedCache/modules/`:
 
 ```javascript
 // common/sharedCache/modules/order.js
@@ -36,21 +36,21 @@ export const useOrderCache = defineCache('order', () => ({
 }));
 ```
 
-### 2. 读写缓存数据
+### 2. Read/Write Cache Data
 
 ```javascript
 import { useOrderCache } from 'common/sharedCache/modules/order';
 
 const orderCache = useOrderCache();
 
-// 写入（直接赋值）
+// Write (direct assignment)
 orderCache.currentOrder = { id: 123, status: 'pending' };
 
-// 读取
+// Read
 console.log(orderCache.currentOrder);
 ```
 
-### 3. 使用 Hook 操作
+### 3. Use Hook Operations
 
 ```javascript
 import { useCacheActions } from 'common/sharedCache';
@@ -58,36 +58,36 @@ import { useOrderCache } from 'common/sharedCache/modules/order';
 
 const { watch, watchAll, patch, reset, getState } = useCacheActions(useOrderCache);
 
-// 监听单个字段
+// Watch single field
 const unwatch = watch('currentOrder', (newVal, oldVal) => {
-    console.log('订单变化:', newVal);
+    console.log('Order changed:', newVal);
 });
 
-// 监听所有字段
+// Watch all fields
 const unwatchAll = watchAll((key, newVal, oldVal) => {
-    console.log(`${key} 变化:`, newVal);
+    console.log(`${key} changed:`, newVal);
 });
 
-// 批量更新
+// Batch update
 patch({ currentOrder: null, selectedStore: null });
 
-// 函数式批量更新
+// Functional batch update
 patch(state => { state.cartItems.push({ sku: 'SKU001' }); });
 
-// 重置为初始状态
+// Reset to initial state
 reset();
 
-// 获取当前状态快照
+// Get current state snapshot
 const snapshot = getState();
 
-// 取消监听（页面卸载时调用）
+// Unwatch (call on page unload)
 unwatch();
 unwatchAll();
 ```
 
-## 典型场景
+## Typical Scenarios
 
-### 门店选择跨页面共享
+### Store Selection Cross-Page Sharing
 
 ```javascript
 // common/sharedCache/modules/store.js
@@ -96,16 +96,16 @@ export const useStoreCache = defineCache('store', () => ({
     recentStores: [],
 }));
 
-// 门店选择页
+// Store selection page
 const storeCache = useStoreCache();
-storeCache.selectedStore = { storeId: 'S001', name: '星巴克门店' };
+storeCache.selectedStore = { storeId: 'S001', name: 'Starbucks Store' };
 
-// 下单页（自动获取已选门店）
+// Order page (automatically gets selected store)
 const storeCache = useStoreCache();
 console.log(storeCache.selectedStore);
 ```
 
-### 接口数据缓存（带过期时间）
+### API Data Caching (With Expiration)
 
 ```javascript
 // common/sharedCache/modules/menu.js
@@ -127,38 +127,38 @@ async function getMenuWithCache() {
 }
 ```
 
-## API 参考
+## API Reference
 
 ### defineCache(id, stateFactory)
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| id | string | 缓存模块唯一标识 |
-| stateFactory | () => object | 返回初始状态的工厂函数 |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| id | string | Cache module unique identifier |
+| stateFactory | () => object | Factory function returning initial state |
 
-返回：`useCache` 函数，调用后返回缓存实例。
+Returns: `useCache` function, calling it returns a cache instance.
 
 ### useCacheActions(useCacheFn)
 
-| 方法 | 说明 |
-|------|------|
-| `watch(key, callback)` | 监听单个字段，返回取消监听函数 |
-| `watchAll(callback)` | 监听所有字段，返回取消监听函数 |
-| `patch(partialState)` | 批量更新，支持对象或函数 |
-| `reset()` | 重置为初始状态 |
-| `getState()` | 获取当前状态快照 |
+| Method | Description |
+|--------|-------------|
+| `watch(key, callback)` | Watch single field, returns unwatch function |
+| `watchAll(callback)` | Watch all fields, returns unwatch function |
+| `patch(partialState)` | Batch update, supports object or function |
+| `reset()` | Reset to initial state |
+| `getState()` | Get current state snapshot |
 
-### 全局方法
+### Global Methods
 
-| 方法 | 说明 |
-|------|------|
-| `getAllCaches()` | 获取所有缓存模块 |
-| `clearAllCaches()` | 清空所有缓存（重置为初始状态） |
-| `destroyCache(id)` | 销毁指定缓存模块 |
+| Method | Description |
+|--------|-------------|
+| `getAllCaches()` | Get all cache modules |
+| `clearAllCaches()` | Clear all caches (reset to initial state) |
+| `destroyCache(id)` | Destroy specified cache module |
 
-## 注意事项
+## Notes
 
-1. **及时取消监听**：在页面 `onUnload` 或 `onHide` 时调用 `unwatch()` 避免内存泄漏
-2. **避免存储大对象**：缓存数据常驻内存，避免存储过大的数据
-3. **模块命名唯一**：`defineCache` 的 id 必须全局唯一
-4. **非持久化**：小程序重启后缓存会清空，需要持久化请配合 Storage 使用
+1. **Unwatch promptly**: Call `unwatch()` on page `onUnload` or `onHide` to avoid memory leaks
+2. **Avoid storing large objects**: Cache data stays in memory, avoid storing overly large data
+3. **Unique module naming**: `defineCache` id must be globally unique
+4. **Not persistent**: Cache clears on mini-program restart, use Storage for persistence

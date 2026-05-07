@@ -1,61 +1,61 @@
-# /deploy - 构建与部署
+# /deploy - Build & Deploy
 
-## 开发流程
+## Development Workflow
 
-### Step 1: 选择构建命令
+### Step 1: Select Build Command
 
 ```bash
-# 微信小程序
-pnpm run app:dev:mp-weixin       # 开发
-pnpm run app:stg:mp-weixin       # 测试
-pnpm run app:prod:mp-weixin      # 生产
+# WeChat Mini Program
+pnpm run app:dev:mp-weixin       # Development
+pnpm run app:stg:mp-weixin       # Staging
+pnpm run app:prod:mp-weixin      # Production
 
-# 支付宝小程序
+# Alipay Mini Program
 pnpm run app:dev:mp-alipay
 
-# H5 业务线
-pnpm run dev:h5-module-config    # 开发
-pnpm run stg:h5-module-config    # 测试
+# H5 Business Lines
+pnpm run dev:h5-module-config    # Development
+pnpm run stg:h5-module-config    # Staging
 
-# 定制化（离线包）
+# Customization (offline package)
 pnpm run dev:h5-customization-mod
-pnpm run build:customization-mod # 生产
+pnpm run build:customization-mod # Production
 ```
 
-### Step 2: 设置环境变量
+### Step 2: Set Environment Variables
 
-| 变量 | 说明 | 示例 |
-|------|------|------|
-| `NODE_CUSTOM_ENV` | 环境 | dev / stg / prod |
-| `UNI_PLATFORM` | 平台 | mp-weixin / mp-alipay / h5-xxx |
-| `BUILD_TYPE` | 构建类型 | OfflinePackage（可选） |
-| `BUSINESS_TYPE` | 业务类型 | MOD / MOP（离线包） |
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `NODE_CUSTOM_ENV` | Environment | dev / stg / prod |
+| `UNI_PLATFORM` | Platform | mp-weixin / mp-alipay / h5-xxx |
+| `BUILD_TYPE` | Build type | OfflinePackage (optional) |
+| `BUSINESS_TYPE` | Business type | MOD / MOP (offline package) |
 
-### Step 3: 内存优化（开发时）
+### Step 3: Memory Optimization (During Development)
 
 ```bash
 export NODE_OPTIONS="--max-old-space-size=4096"
 ```
 
-### Step 4: 构建产出
+### Step 4: Build Output
 
-构建产物输出到 `dist/` 目录。
+Build artifacts are output to the `dist/` directory.
 
-## 构建流程说明
+## Build Process Overview
 
-`build-script/platform-builder.js` 核心流程：
-1. 读取环境变量 → 2. 执行平台构建脚本 → 3. 生成 pages.json/manifest.json → 4. 复制 share modules → 5. Vue CLI 构建 → 6. 输出到 dist/
+`build-script/platform-builder.js` core flow:
+1. Read environment variables → 2. Execute platform build scripts → 3. Generate pages.json/manifest.json → 4. Copy share modules → 5. Vue CLI build → 6. Output to dist/
 
-## CI/CD 流水线
+## CI/CD Pipeline
 
-- **develop 分支** → 自动部署测试环境
-- **main 分支** → 人工审批后部署生产环境
-- **PR** → 自动 lint + test + 构建验证
+- **develop branch** → Auto-deploy to staging environment
+- **main branch** → Manual approval then deploy to production
+- **PR** → Auto lint + test + build verification
 
-## 分支策略
+## Branch Strategy
 
-`main`(生产) → `develop`(测试) → `feature/*`(功能) → `hotfix/*`(紧急修复)
+`main`(production) → `develop`(staging) → `feature/*`(feature) → `hotfix/*`(hotfix)
 
-## 详细参考
+## Detailed Reference
 
-→ 读取 [reference/deployment.md](../reference/deployment.md) 获取完整 CI/CD 配置、GitHub Actions YAML、部署脚本
+→ Read [reference/deployment.md](../reference/deployment.md) for full CI/CD config, GitHub Actions YAML, deployment scripts

@@ -1,51 +1,51 @@
-# 服务层完整开发指南
+# Service Layer Full Development Guide
 
-## 职责边界
+## Responsibility Boundaries
 
-**Service Layer 只负责**:
-- 接口请求
-- 简单数据转换
+**Service Layer is only responsible for**:
+- API requests
+- Simple data transformation
 
-**不应包含**:
-- 路由导航逻辑
-- 复杂业务逻辑（应在页面 hooks 中）
+**Should not contain**:
+- Route navigation logic
+- Complex business logic (should be in page hooks)
 
-**编码规范**: 统一使用函数式写法，避免 class 写法
+**Coding Standard**: Use functional style consistently, avoid class style
 
-## 目录结构
+## Directory Structure
 
 ```bash
 src/services/
-├── index.js              # 统一导出入口
-├── user/                 # 用户域
-│   ├── index.js          # 服务方法（路由入口）
-│   ├── api.js            # API 接口定义
-│   ├── user.weixin.js    # 微信平台实现
-│   ├── user.alipay.js    # 支付宝平台实现
-│   └── user.h5.js        # H5 平台实现
-├── order/                # 订单域
-├── shop/                 # 门店域
-├── coupon/               # 优惠券域
-├── payment/              # 支付域（多渠道场景）
+├── index.js              # Unified export entry
+├── user/                 # User domain
+│   ├── index.js          # Service methods (routing entry)
+│   ├── api.js            # API definitions
+│   ├── user.weixin.js    # WeChat platform implementation
+│   ├── user.alipay.js    # Alipay platform implementation
+│   └── user.h5.js        # H5 platform implementation
+├── order/                # Order domain
+├── shop/                 # Store domain
+├── coupon/               # Coupon domain
+├── payment/              # Payment domain (multi-channel scenario)
 │   ├── index.js
 │   ├── payment.weixin.js
 │   ├── payment.alipay.js
 │   ├── payment.douyin.js
 │   └── payment.h5.js
-└── map/                  # 地图域（多渠道）
+└── map/                  # Map domain (multi-channel)
     ├── index.js
     ├── map.weixin.js
     ├── map.amap.js
     └── map.h5.js
 ```
 
-## 新建域服务步骤
+## Steps to Create New Domain Service
 
-### 1. 创建域目录
+### 1. Create Domain Directory
 
-在 `src/services/` 下创建新目录，如 `product/`
+Create a new directory under `src/services/`, e.g., `product/`
 
-### 2. 创建 api.js
+### 2. Create api.js
 
 ```javascript
 /**
@@ -62,7 +62,7 @@ const apis = {
 export default getApi(apis);
 ```
 
-### 3. 创建 index.js（函数式写法）
+### 3. Create index.js (Functional Style)
 
 ```javascript
 /**
@@ -102,55 +102,55 @@ export async function searchProducts(keyword, params = {}, options = {}) {
 }
 ```
 
-### 4. 注册到统一入口
+### 4. Register to Unified Entry
 
 ```javascript
 // src/services/index.js
 export * as productService from './product';
 ```
 
-## 域划分原则
+## Domain Division Principles
 
-### 按业务边界划分
+### Divide by Business Boundary
 
-- 用户相关: 登录、注册、个人信息、地址管理 → `user/`
-- 订单相关: 下单、订单列表、订单详情 → `order/`
-- 门店相关: 门店查询、收藏门店 → `shop/`
-- 优惠券相关: 领取、使用、列表 → `coupon/`
-- 支付相关: 支付处理、支付方式 → `payment/`
-- 地图相关: 地图查询、地图显示 → `map/`
+- User-related: login, registration, personal info, address management → `user/`
+- Order-related: place order, order list, order detail → `order/`
+- Store-related: store search, favorite stores → `shop/`
+- Coupon-related: claim, use, list → `coupon/`
+- Payment-related: payment processing, payment methods → `payment/`
+- Map-related: map search, map display → `map/`
 
-### 反模式
+### Anti-Patterns
 
-- 不要按技术类型划分（如 `get/`、`post/`）
-- 不要按页面划分（如 `homePage/`、`minePage/`）
-- 不要创建过度细粒度的域
+- Don't divide by technical type (e.g., `get/`, `post/`)
+- Don't divide by page (e.g., `homePage/`, `minePage/`)
+- Don't create overly fine-grained domains
 
-## 与现有代码的关系
+## Relationship with Existing Code
 
-| 目录 | 职责 |
-|------|------|
-| `common/services/` | 跨域通用服务：认证、SDK、系统 |
-| `customized/services/` | 平台定制服务实现 |
-| `shares/services/` | 分包内业务服务，建议逐步迁移到 `services/` 统一管理 |
+| Directory | Responsibility |
+|-----------|---------------|
+| `common/services/` | Cross-domain common services: auth, SDK, system |
+| `customized/services/` | Platform-specific service implementations |
+| `shares/services/` | In-package business services, recommended to gradually migrate to `services/` for unified management |
 
-## 请求配置选项
+## Request Configuration Options
 
 ```javascript
 {
-  usePreventTool: true,    // 启用请求防抖
-  isCache: true,           // 缓存响应数据
-  forceCache: true,        // 强制使用缓存
-  isNoToast: true,         // 不显示错误 toast
-  isErrorCompensate: true, // 错误自动重试
-  timeout: 10000,          // 超时时间（ms）
-  deviceInfo: true,        // 包含设备信息
+  usePreventTool: true,    // Enable request debounce
+  isCache: true,           // Cache response data
+  forceCache: true,        // Force use cache
+  isNoToast: true,         // Don't show error toast
+  isErrorCompensate: true, // Auto retry on error
+  timeout: 10000,          // Timeout (ms)
+  deviceInfo: true,        // Include device info
 }
 ```
 
-## 常见模式
+## Common Patterns
 
-### 数据获取模式
+### Data Fetching Pattern
 
 ```javascript
 export async function fetchData(id, options = {}) {
@@ -159,7 +159,7 @@ export async function fetchData(id, options = {}) {
 }
 ```
 
-### 列表获取模式
+### List Fetching Pattern
 
 ```javascript
 export async function fetchList(params = {}, options = {}) {
@@ -172,7 +172,7 @@ export async function fetchList(params = {}, options = {}) {
 }
 ```
 
-### 错误处理模式
+### Error Handling Pattern
 
 ```javascript
 export async function updateData(data, options = {}) {
@@ -186,20 +186,20 @@ export async function updateData(data, options = {}) {
 }
 ```
 
-## 最佳实践
+## Best Practices
 
-1. **函数式写法**：统一使用函数式，避免 class
-2. **单一职责**：只处理接口请求和简单数据转换
-3. **不处理路由**：不在 service 层处理路由导航
-4. **业务分离**：复杂业务逻辑放在页面 hooks 中
-5. **错误处理**：使用 try-catch-finally
-6. **数据转换**：保持简单和可预测
+1. **Functional style**: Use functional style consistently, avoid class
+2. **Single responsibility**: Only handle API requests and simple data transformation
+3. **No routing**: Don't handle route navigation in service layer
+4. **Business separation**: Complex business logic goes in page hooks
+5. **Error handling**: Use try-catch-finally
+6. **Data transformation**: Keep simple and predictable
 
-## 多渠道服务设计
+## Multi-Channel Service Design
 
-当服务需要针对不同平台（微信/支付宝/抖音/H5 等）有差异化实现时，采用分流模式。
+When services need different implementations for different platforms (WeChat/Alipay/Douyin/H5, etc.), use the routing pattern.
 
-### 分流入口写法
+### Routing Entry Pattern
 
 ```javascript
 // services/payment/index.js
@@ -226,23 +226,23 @@ export * from './payment.h5.js';
 // #endif
 ```
 
-### 自定义条件编译宏
+### Custom Conditional Compilation Macros
 
-项目在 `src/package.json` 中定义了自定义宏：
+The project defines custom macros in `src/package.json`:
 
-| 宏名称 | 说明 | 基于平台 |
-|--------|------|----------|
-| MP-DINGTALK | 钉钉小程序 | mp-alipay |
-| H5-CMB | 招商银行H5 | h5 |
+| Macro Name | Description | Based On |
+|------------|-------------|----------|
+| MP-DINGTALK | DingTalk mini-program | mp-alipay |
+| H5-CMB | CMB H5 | h5 |
 
-如需新增自定义宏，在 `src/package.json` 中添加：
+To add a new custom macro, add it in `src/package.json`:
 
 ```json
 {
     "uni-app": {
         "scripts": {
             "h5-xxx": {
-                "title": "XXX渠道H5",
+                "title": "XXX Channel H5",
                 "env": { "UNI_PLATFORM": "h5" },
                 "define": { "H5-XXX": true }
             }
@@ -251,17 +251,17 @@ export * from './payment.h5.js';
 }
 ```
 
-### 响应体模型映射
+### Response Model Mapping
 
-当不同渠道返回数据结构不一致时，定义统一响应模型：
+When different channels return inconsistent data structures, define a unified response model:
 
 ```bash
 services/user/
-├── index.js              # 分流入口
-├── api.js                # API 定义
-├── model.js              # 统一响应模型定义
-├── user.weixin.js        # 微信实现（含 mapper）
-└── user.h5.js            # H5 实现（含 mapper）
+├── index.js              # Routing entry
+├── api.js                # API definitions
+├── model.js              # Unified response model definition
+├── user.weixin.js        # WeChat implementation (with mapper)
+└── user.h5.js            # H5 implementation (with mapper)
 ```
 
 ```javascript
@@ -277,7 +277,7 @@ export const UserInfoModel = {
 ```
 
 ```javascript
-// services/user/user.weixin.js - 含 mapper
+// services/user/user.weixin.js - With mapper
 function mapUserInfo(raw) {
     return {
         userId: raw.user_id || raw.userId,
@@ -295,7 +295,7 @@ export async function getUserInfo(options = {}) {
 }
 ```
 
-复杂映射逻辑可抽为独立 mapper 文件：
+For complex mapping logic, extract into separate mapper files:
 
 ```bash
 services/order/
@@ -307,10 +307,10 @@ services/order/
 └── order.h5.js
 ```
 
-### 多渠道设计原则
+### Multi-Channel Design Principles
 
-1. **接口签名一致**：各平台实现的方法名、参数、返回值保持一致
-2. **差异内聚**：平台差异封装在具体实现文件内，不暴露给调用方
-3. **分流入口简洁**：index.js 只做条件编译分流，不包含业务逻辑
-4. **公共逻辑复用**：多平台共用逻辑抽到 api.js 或单独 utils 文件
-5. **响应体统一**：各渠道返回不一致时，通过 mapper 转换为统一模型
+1. **Consistent interface signatures**: Method names, parameters, and return values must be consistent across platform implementations
+2. **Cohesive differences**: Platform differences are encapsulated within specific implementation files, not exposed to callers
+3. **Simple routing entry**: index.js only does conditional compilation routing, no business logic
+4. **Shared logic reuse**: Multi-platform shared logic extracted to api.js or separate utils files
+5. **Unified response**: When channels return inconsistent data, convert to unified models via mapper

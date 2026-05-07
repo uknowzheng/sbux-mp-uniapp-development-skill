@@ -1,93 +1,93 @@
-# 静态资源管理规范
+# Static Asset Management Guide
 
-## 目录结构
+## Directory Structure
 
 ```bash
 src/static/
-├── shares/                    # 业务包静态资源
-│   ├── public/               # 公共资源
+├── shares/                    # Business package static assets
+│   ├── public/               # Common assets
 │   │   └── images/
-│   │       ├── reservation/  # 预约相关
-│   │       ├── mod/          # 专星送相关
-│   │       ├── mop/          # 啡快相关
-│   │       └── ctn/          # 定制化相关
-│   ├── common/               # 通用资源
-│   ├── activity/             # 活动包资源
-│   └── ...                   # 其他业务包
+│   │       ├── reservation/  # Reservation-related
+│   │       ├── mod/          # MOD delivery-related
+│   │       ├── mop/          # MOP pickup-related
+│   │       └── ctn/          # Customization-related
+│   ├── common/               # Shared assets
+│   ├── activity/             # Activity package assets
+│   └── ...                   # Other business packages
 ```
 
-## 核心原则
+## Core Principles
 
-1. 按业务包组织资源
-2. 使用 `imgUrl()` 方法引用图片
-3. 编译时自动处理路径拼接
+1. Organize assets by business package
+2. Use `imgUrl()` method to reference images
+3. Path concatenation is handled automatically at build time
 
-## imgUrl 使用方式
+## imgUrl Usage
 
-在 Vue 模板中引用图片时，**必须**使用 `imgUrl()` 方法。
+When referencing images in Vue templates, you **must** use the `imgUrl()` method.
 
-### 动态绑定（:src）
+### Dynamic Binding (:src)
 
 ```vue
 <image :src="imgUrl('shares/public/images/reservation/select-no-city.png')" />
 ```
 
-### 静态绑定（src）
+### Static Binding (src)
 
 ```vue
 <image src="imgUrl('shares/public/images/mod/banner.png')" />
 ```
 
-### 完整示例
+### Complete Example
 
 ```vue
 <template>
     <view>
-        <!-- 动态绑定 -->
+        <!-- Dynamic binding -->
         <image :src="imgUrl('shares/public/images/reservation/select-no-city.png')" />
 
-        <!-- 静态绑定 -->
+        <!-- Static binding -->
         <image src="imgUrl('shares/public/images/mod/banner.png')" />
 
-        <!-- 带其他属性 -->
+        <!-- With other attributes -->
         <image class="icon" :src="imgUrl('shares/public/images/mop/choiced.png')" mode="aspectFit" />
 
-        <!-- 完整 URL（保持不变） -->
+        <!-- Full URL (remains unchanged) -->
         <image :src="imgUrl('https://example.com/image.png')" />
     </view>
 </template>
 ```
 
-## 路径说明
+## Path Explanation
 
-| 路径类型 | 写法 | 处理方式 |
-|---------|------|---------|
-| 相对路径 | `imgUrl('shares/common/icon.png')` | 自动添加 `/static/` 前缀 |
-| 完整 URL | `imgUrl('https://example.com/image.png')` | 保持不变 |
+| Path Type | Pattern | Processing |
+|-----------|---------|-----------|
+| Relative path | `imgUrl('shares/common/icon.png')` | Auto-prepends `/static/` prefix |
+| Full URL | `imgUrl('https://example.com/image.png')` | Remains unchanged |
 
-## 注意事项
+## Notes
 
-1. 只能在 `<image>` 标签中使用 `imgUrl()`
-2. 必须使用单引号包裹路径：`imgUrl('path')`
-3. 编译时自动转换为实际路径，无需在 `setup()` 中导入 `imgUrl` 函数
-4. 仅支持 `imgUrl()` 方式，不要使用 `$imgUrl()`
+1. Only use `imgUrl()` in `<image>` tags
+2. Must use single quotes for paths: `imgUrl('path')`
+3. Automatically converts to actual paths at build time, no need to import `imgUrl` function in `setup()`
+4. Only `imgUrl()` is supported, do not use `$imgUrl()`
 
-## 图片命名规范
+## Image Naming Conventions
 
-- 使用小写字母和连字符：`user-avatar.png`
-- 避免中文和特殊字符
-- 语义化命名：`icon-close.png`、`bg-header.png`
+- Use lowercase letters and hyphens: `user-avatar.png`
+- Avoid Chinese and special characters
+- Semantic naming: `icon-close.png`, `bg-header.png`
 
-## 性能优化
+## Performance Optimization
 
-- 使用 WebP 格式（兼容性允许的情况下）
-- 压缩图片后再上传
-- 懒加载大图片
+- Use WebP format (where compatibility allows)
+- Compress images before uploading
+- Lazy-load large images
 
-## 相关文件
+## Related Files
 
-| 文件 | 说明 |
-|------|------|
-| `plugins/imgUrl-loader.js` | Loader 实现 |
-| `vue.config.js` | 构建配置 |
-| `plugins/ImgUrlCompilePlugin.md` | 使用文档 |
+| File | Description |
+|------|-------------|
+| `plugins/imgUrl-loader.js` | Loader implementation |
+| `vue.config.js` | Build configuration |
+| `plugins/ImgUrlCompilePlugin.md` | Usage documentation |

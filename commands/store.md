@@ -1,10 +1,10 @@
-# /store - 定义/使用 Store
+# /store - Define/Use Store
 
-## 开发流程
+## Development Workflow
 
-### Step 1: 定义 Store
+### Step 1: Define Store
 
-在 `common/stores/` 下创建新 Store 文件，使用 `defineStore` 写法：
+Create a new Store file under `common/stores/` using the `defineStore` pattern:
 
 ```javascript
 // common/stores/useOrderStore.js
@@ -20,38 +20,38 @@ export const useOrderStore = defineStore('order', ({ state, commit }) => {
 });
 ```
 
-### Step 2: 在页面/Composable 中使用
+### Step 2: Use in Page/Composable
 
 ```javascript
 const orderStore = useOrderStore();
-orderStore.orderList.value;          // JS 中读值（需要 .value）
-orderStore.setOrderList({ data });   // 修改（禁止直接赋值 .value）
+orderStore.orderList.value;          // Read in JS (requires .value)
+orderStore.setOrderList({ data });   // Modify (direct .value assignment is prohibited)
 ```
 
-模板中 `{{ orderList }}` 自动解包，无需 `.value`。
+In templates, `{{ orderList }}` auto-unwraps, no `.value` needed.
 
 ### Step 3: Transaction Store
 
-交易相关状态使用 `useCartStore` / `useShopStore` / `useTransactionStore`（详见 [reference/transaction-store.md](../reference/transaction-store.md)）。
+For transaction-related state, use `useCartStore` / `useShopStore` / `useTransactionStore` (see [reference/transaction-store.md](../reference/transaction-store.md)).
 
-## 用法速查
+## Usage Quick Reference
 
-| 场景 | 写法 |
-|------|------|
-| 获取 store | `const s = useXxxStore()` |
-| JS 中读值 | `s.xxx.value` |
-| 模板中读值 | `{{ xxx }}`（自动解包） |
-| 修改状态 | `s.setXxx({ data: xxx })` |
-| Watch 变化 | `watch(() => s.xxx.value, ...)` |
+| Scenario | Pattern |
+|----------|---------|
+| Get store | `const s = useXxxStore()` |
+| Read value in JS | `s.xxx.value` |
+| Read value in template | `{{ xxx }}` (auto-unwrapped) |
+| Modify state | `s.setXxx({ data: xxx })` |
+| Watch changes | `watch(() => s.xxx.value, ...)` |
 
-## 关键约束
+## Key Constraints
 
-1. JS 读值需要 `.value`，模板自动解包
-2. 禁止直接赋值 `.value`，必须用导出方法
-3. Mutation 常量不导出，仅在 Store 内部使用
-4. 参数格式与原 Vuex mutation 一致
+1. JS reads require `.value`, templates auto-unwrap
+2. Direct `.value` assignment is prohibited, must use exported methods
+3. Mutation constants are not exported, only used internally in Store
+4. Parameter format is consistent with original Vuex mutations
 
-## 详细参考
+## Detailed Reference
 
-→ 读取 [reference/store.md](../reference/store.md) 获取完整用法、页面/Composable 示例
-→ 读取 [reference/transaction-store.md](../reference/transaction-store.md) 获取 Transaction Store（购物车/门店/交易聚合层）使用指南
+→ Read [reference/store.md](../reference/store.md) for full usage, page/composable examples
+→ Read [reference/transaction-store.md](../reference/transaction-store.md) for Transaction Store (cart/store/transaction aggregate) usage guide

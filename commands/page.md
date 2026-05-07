@@ -1,41 +1,41 @@
-# /page - 新建页面开发
+# /page - Create New Page
 
-## 开发流程
+## Development Workflow
 
-### Step 1: 创建页面目录
+### Step 1: Create Page Directory
 
 ```bash
 pages/
-└── [pageName]/              # 页面目录（camelCase）
-    ├── index.vue            # 页面组件
-    ├── use[PageName].js     # 页面主 composable
-    └── composables/         # 页面子 composables
+└── [pageName]/              # Page directory (camelCase)
+    ├── index.vue            # Page component
+    ├── use[PageName].js     # Main composable
+    └── composables/         # Sub-composables
 ```
 
-### Step 2: 编写主 Composable
+### Step 2: Write Main Composable
 
-主 composable 管理所有生命周期，引入子 composables（纯逻辑无生命周期）。跨 composables 的 watch 只在主 composable 中管理。
+The main composable manages all lifecycles and imports sub-composables (pure logic, no lifecycles). Cross-composable watches are managed only in the main composable.
 
-命名导出：`export function useXxx() {}`
+Named export: `export function useXxx() {}`
 
-### Step 3: 编写页面 Vue
+### Step 3: Write Page Vue
 
-- **无平台差异** → `<script setup>` + `import { useXxx } from './useXxx'`
-- **有 `#ifdef` 条件编译** → Options `setup()` + 声明空生命周期方法
+- **No platform differences** → `<script setup>` + `import { useXxx } from './useXxx'`
+- **With `#ifdef` conditional compilation** → Options `setup()` + declare empty lifecycle methods
 
-需手动声明的生命周期：`onReachBottom` / `onShareAppMessage` / `onPullDownRefresh` / `onPageScroll`
+Lifecycles requiring manual declaration: `onReachBottom` / `onShareAppMessage` / `onPullDownRefresh` / `onPageScroll`
 
-### Step 4: 注册页面路由
+### Step 4: Register Page Route
 
-在 `pages.config.js` 中添加页面路径。
+Add the page path in `pages.config.js`.
 
-## 关键约束
+## Key Constraints
 
-1. 子 composable 严禁包含生命周期
-2. 跨 composables 的 watch 只在主 composable 中管理
-3. 需手动声明的生命周期在 .vue 中声明空方法
-4. 命名导出：`export function useXxx() {}`
+1. Sub-composables must not contain lifecycles
+2. Cross-composable watches are managed only in the main composable
+3. Lifecycles requiring manual declaration must have empty methods in .vue
+4. Named export: `export function useXxx() {}`
 
-## 详细参考
+## Detailed Reference
 
-→ 读取 [reference/composables.md](../reference/composables.md) 获取主/子 composable 完整架构与代码示例
+→ Read [reference/composables.md](../reference/composables.md) for full main/sub composable architecture and code examples

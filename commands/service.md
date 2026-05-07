@@ -1,14 +1,14 @@
-# /service - 新建服务域
+# /service - Create New Service Domain
 
-## 开发流程
+## Development Workflow
 
-### Step 1: 创建域目录
+### Step 1: Create Domain Directory
 
-在 `src/services/` 下创建新目录，如 `product/`
+Create a new directory under `src/services/`, e.g., `product/`
 
-### Step 2: 创建 api.js
+### Step 2: Create api.js
 
-使用 `getApi` 定义接口路径：
+Use `getApi` to define interface paths:
 
 ```javascript
 import { getApi } from 'common/utils/api.js';
@@ -16,33 +16,33 @@ const apis = { getProductList: '/product/list', getProductDetail: '/product/deta
 export default getApi(apis);
 ```
 
-### Step 3: 创建 index.js（函数式写法）
+### Step 3: Create index.js (Functional Style)
 
-导入 `http` + `api`，导出 async 函数。统一使用函数式写法，避免 class。
+Import `http` + `api`, export async functions. Use functional style consistently, avoid class.
 
-### Step 4: 注册到统一入口
+### Step 4: Register to Unified Entry
 
 ```javascript
 // src/services/index.js
 export * as productService from './product';
 ```
 
-### Step 5: 处理平台差异（如需要）
+### Step 5: Handle Platform Differences (If Needed)
 
-多渠道场景使用条件编译分流入口（`#ifdef`），各平台实现保持接口签名一致。需要时创建 `model.js` 定义统一响应模型 + mapper 函数。
+For multi-channel scenarios, use conditional compilation routing entry (`#ifdef`). Keep interface signatures consistent across platform implementations. Create `model.js` for unified response models + mapper functions when needed.
 
-## 关键约束
+## Key Constraints
 
-1. 只负责接口请求 + 简单数据转换
-2. 禁止包含路由导航逻辑
-3. 禁止包含复杂业务逻辑（应在页面 hooks 中）
-4. 统一函数式写法，避免 class
-5. 按业务边界划分域，不要按技术类型或页面划分
+1. Only responsible for API requests + simple data transformation
+2. No route navigation logic
+3. No complex business logic (should be in page hooks)
+4. Use functional style consistently, avoid class
+5. Divide domains by business boundary, not by technical type or page
 
-## 常用请求配置
+## Common Request Options
 
-`options` 参数：`usePreventTool`(防抖) / `isCache`(缓存) / `isNoToast`(无错误提示) / `timeout`(超时)
+`options` parameter: `usePreventTool`(debounce) / `isCache`(cache) / `isNoToast`(no error toast) / `timeout`(timeout)
 
-## 详细参考
+## Detailed Reference
 
-→ 读取 [reference/services.md](../reference/services.md) 获取完整目录结构、请求配置、多渠道分流、响应体模型映射
+→ Read [reference/services.md](../reference/services.md) for full directory structure, request config, multi-channel routing, response model mapping

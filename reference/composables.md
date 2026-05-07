@@ -1,19 +1,19 @@
-# Composable 完整架构指南
+# Composable Full Architecture Guide
 
-## 主/子 Composable 分层架构
+## Main/Sub Composable Layering Architecture
 
-### 主 Composable：生命周期管理者
+### Main Composable: Lifecycle Manager
 
-**职责**：管理所有生命周期钩子，协调所有子 composables
+**Responsibility**: Manage all lifecycle hooks, coordinate all sub-composables
 
-**特点**：
-- 包含所有 `onLoad`, `onShow`, `onUnload`, `onPageScroll` 等生命周期
-- 引入所有子 composables
-- 管理跨 composables 的 `watch` 监听
-- 组合所有逻辑，暴露给页面使用
+**Characteristics**:
+- Contains all `onLoad`, `onShow`, `onUnload`, `onPageScroll` and other lifecycles
+- Imports all sub-composables
+- Manages cross-composable `watch` listeners
+- Composes all logic, exposes for page usage
 
 ```javascript
-// pages/pay/usePay.js - 主 composable
+// pages/pay/usePay.js - Main composable
 import { onLoad, onShow, onUnload, onPageScroll } from '@dcloudio/uni-app';
 import { ref, watch, computed } from '@vue/composition-api';
 
@@ -24,7 +24,7 @@ import { usePayTrack } from './composables/usePayTrack.js';
 import { useScroll } from './composables/useScroll.js';
 
 export const usePay = () => {
-  // 1. 生命周期管理（只在主 composable 中）
+  // 1. Lifecycle management (only in main composable)
   onLoad((params) => {
     fetchPayMethod(params);
   });
@@ -41,17 +41,17 @@ export const usePay = () => {
     cleanup();
   });
 
-  // 2. 引入所有子 composables（纯逻辑，无生命周期）
+  // 2. Import all sub-composables (pure logic, no lifecycles)
   const { orderReviewData, fetchReviewData } = useOrder();
   const { selectedPayMethod, payMethodList, submitOrder } = usePayMethod();
   const { isNextDayOrder, currentStore } = useStoreInfo();
   const { trackPayResult, trackPaymentToolAction } = usePayTrack();
   const { isShow: isToOrderShow, scrollToTarget: scrollToOrder } = useScroll();
 
-  // 3. 跨 composables 的 watch 管理（只在主 composable 中）
+  // 3. Cross-composable watch management (only in main composable)
   watch(selectedPayMethod, (newVal, oldVal) => {
     if (newVal !== oldVal) {
-      trackPaymentToolAction(newVal === PaymentType.SVC ? '星礼卡' : '微信');
+      trackPaymentToolAction(newVal === PaymentType.SVC ? 'SVC Card' : 'WeChat');
     }
   });
 
@@ -61,7 +61,7 @@ export const usePay = () => {
     }
   });
 
-  // 4. 组合计算属性（依赖多个子 composables）
+  // 4. Composed computed properties (depending on multiple sub-composables)
   const canSubmit = computed(() => {
     return isLogin.value &&
            orderReviewData.value &&
@@ -69,13 +69,13 @@ export const usePay = () => {
            !isDisabledSubmit.value;
   });
 
-  // 5. 组合方法
+  // 5. Composed methods
   const handleSubmit = async () => {
     if (!checkAgreementCheck()) return;
     await submitOrder();
   };
 
-  // 6. 返回所有需要的状态和方法
+  // 6. Return all needed state and methods
   return {
     orderReviewData, selectedPayMethod, payMethodList,
     isNextDayOrder, currentStore, isToOrderShow,
@@ -84,20 +84,20 @@ export const usePay = () => {
 };
 ```
 
-### 子 Composable：纯业务逻辑
+### Sub-Composable: Pure Business Logic
 
-**职责**：处理单一业务逻辑，无生命周期
+**Responsibility**: Handle single business logic, no lifecycles
 
-**特点**：
-- 不包含 `onLoad`, `onShow` 等生命周期
-- 只包含 `ref`, `computed`, `methods`
-- 可以依赖其他子 composables
-- 可以依赖 store
+**Characteristics**:
+- Does not contain `onLoad`, `onShow` and other lifecycles
+- Only contains `ref`, `computed`, `methods`
+- Can depend on other sub-composables
+- Can depend on store
 
-#### 数据层子 Composable
+#### Data Layer Sub-Composable
 
 ```javascript
-// useOrder.js - 纯数据逻辑
+// useOrder.js - Pure data logic
 import { ref, computed } from '@vue/composition-api';
 import { orderReview, orderApply } from 'shares/transaction/services/order/index.js';
 
@@ -127,10 +127,10 @@ export const useOrder = () => {
 };
 ```
 
-#### 依赖其他子 Composable
+#### Depending on Other Sub-Composables
 
 ```javascript
-// usePayMethod.js - 依赖其他子 composables
+// usePayMethod.js - Depends on other sub-composables
 import { ref, computed } from '@vue/composition-api';
 import { getPayMethod, getSVCCardList } from 'shares/transaction/services/payment/index.js';
 import { useStoreInfo } from 'shares/transaction/composables/useStoreInfo.js';
@@ -177,9 +177,9 @@ export const usePayMethod = () => {
 };
 ```
 
-## Watch 管理规范
+## Watch Management Conventions
 
-### 跨 Composables 的 Watch（在主 Composable 中管理）
+### Cross-Composable Watches (Managed in Main Composable)
 
 ```javascript
 // usePay.js
@@ -189,10 +189,10 @@ export const usePay = () => {
   const { orderReviewData } = useOrder();
   const { fetchPayMethod } = usePayMethod();
 
-  // 跨 composables 的 watch 只在主 composable 中管理
+  // Cross-composable watches only in main composable
   watch(selectedPayMethod, (newVal, oldVal) => {
     if (newVal !== oldVal) {
-      trackPaymentToolAction(newVal === PaymentType.SVC ? '星礼卡' : '微信');
+      trackPaymentToolAction(newVal === PaymentType.SVC ? 'SVC Card' : 'WeChat');
     }
   });
 
@@ -206,14 +206,14 @@ export const usePay = () => {
 };
 ```
 
-### Composable 内部的 Watch（在子 Composable 中管理）
+### Internal Watches within a Composable (Managed in Sub-Composable)
 
 ```javascript
-// useOrder.js - 子 composable 管理内部的 watch
+// useOrder.js - Sub-composable manages internal watch
 export const useOrder = () => {
   const orderReviewData = ref(null);
 
-  // 内部的 watch 在子 composable 中管理
+  // Internal watch managed in sub-composable
   watch(orderReviewData, (newVal) => {
     if (newVal) {
       console.log('Order review data updated:', newVal);
@@ -224,42 +224,42 @@ export const useOrder = () => {
 };
 ```
 
-## 错误示例
+## Incorrect Examples
 
 ```javascript
-// 错误：子 composable 包含生命周期
+// Wrong: Sub-composable contains lifecycle
 export function useOrderData() {
-  onLoad(() => { fetchData(); }); // 严禁！
+  onLoad(() => { fetchData(); }); // Prohibited!
   return { data };
 }
 
-// 错误：Default export
+// Wrong: Default export
 export default function useOrderDetail() {}
 
-// 错误：非响应式
+// Wrong: Non-reactive
 export function useCounter() {
-  let count = 0; // 应该用 ref
+  let count = 0; // Should use ref
   return { count };
 }
 
-// 错误：直接修改 props
+// Wrong: Directly modifying props
 export function useProps(props) {
-  props.value = 'new value'; // 不要直接修改
+  props.value = 'new value'; // Don't modify directly
 }
 
-// 错误：职责不清
+// Wrong: Unclear responsibility
 export function useEverything() {
-  // 数据获取、业务逻辑、埋点、路由全部混在一起
+  // Data fetching, business logic, tracking, routing all mixed together
 }
 ```
 
-## 正确示例
+## Correct Examples
 
 ```javascript
-// 正确：主 composable 管理生命周期
+// Correct: Main composable manages lifecycle
 export function usePay() {
-  onLoad(() => { /* 初始化 */ });
-  onShow(() => { /* 刷新 */ });
+  onLoad(() => { /* initialize */ });
+  onShow(() => { /* refresh */ });
 
   const { orderReviewData } = useOrder();
   const { selectedPayMethod } = usePayMethod();
@@ -271,7 +271,7 @@ export function usePay() {
   return { orderReviewData, selectedPayMethod };
 }
 
-// 正确：子 composable 纯逻辑
+// Correct: Sub-composable pure logic
 export function useOrder() {
   const orderReviewData = ref(null);
   const fetchReviewData = async (params) => {
@@ -280,13 +280,13 @@ export function useOrder() {
   return { orderReviewData, fetchReviewData };
 }
 
-// 正确：不修改 props，使用本地 ref
+// Correct: Don't modify props, use local ref
 export function useProps(props) {
   const localValue = ref(props.value);
   return { localValue };
 }
 
-// 正确：单一职责
-export function useOrderData() { /* 只负责数据获取 */ }
-export function useOrderLogic() { /* 只负责业务逻辑 */ }
+// Correct: Single responsibility
+export function useOrderData() { /* Only data fetching */ }
+export function useOrderLogic() { /* Only business logic */ }
 ```

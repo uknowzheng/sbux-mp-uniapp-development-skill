@@ -1,8 +1,8 @@
-# 完整代码示例
+# Complete Code Examples
 
-## 示例1：支付页面完整链路
+## Example 1: Payment Page Full Chain
 
-### 页面入口 index.vue
+### Page Entry index.vue
 
 ```vue
 <template>
@@ -31,7 +31,7 @@ export default {
     H5Navigation,
     // #endif
   },
-  // 需要手动声明的生命周期（空方法，实际逻辑在 hook）
+  // Lifecycles requiring manual declaration (empty methods, actual logic in hook)
   onReachBottom() {},
   onShareAppMessage() {},
   onPullDownRefresh() {},
@@ -43,7 +43,7 @@ export default {
 </script>
 ```
 
-### 主 Composable usePay.js
+### Main Composable usePay.js
 
 ```javascript
 import { onLoad, onShow, onUnload, onPageScroll } from '@dcloudio/uni-app';
@@ -53,29 +53,29 @@ import { usePayMethod } from './composables/usePayMethod.js';
 import { usePayTrack } from './composables/usePayTrack.js';
 
 export function usePay() {
-  // 1. 生命周期管理
+  // 1. Lifecycle management
   onLoad((params) => { fetchReviewData(params); });
   onShow(() => { trackPageView(); });
   onUnload(() => { cleanup(); });
 
-  // 2. 引入子 composables
+  // 2. Import sub-composables
   const { orderReviewData, fetchReviewData, isCartEmpty } = useOrder();
   const { selectedPayMethod, payMethodList, fetchPayMethod, submitOrder } = usePayMethod();
   const { trackPageView, trackPaymentToolAction } = usePayTrack();
 
-  // 3. 跨 composables 的 watch
+  // 3. Cross-composable watch
   watch(selectedPayMethod, (newVal, oldVal) => {
     if (newVal !== oldVal) {
       trackPaymentToolAction(newVal);
     }
   });
 
-  // 4. 组合计算属性
+  // 4. Composed computed property
   const canSubmit = computed(() => {
     return orderReviewData.value && selectedPayMethod.value && !isCartEmpty.value;
   });
 
-  // 5. 组合方法
+  // 5. Composed methods
   const handleSubmit = async () => {
     if (!canSubmit.value) return;
     await submitOrder();
@@ -92,7 +92,7 @@ export function usePay() {
 }
 ```
 
-### 子 Composable useOrder.js
+### Sub-Composable useOrder.js
 
 ```javascript
 import { ref, computed } from '@vue/composition-api';
@@ -113,7 +113,7 @@ export function useOrder() {
 }
 ```
 
-## 示例2：服务调用 + Store + 埋点完整链路
+## Example 2: Service + Store + Tracking Full Chain
 
 ```javascript
 // composables/useCouponList.js
@@ -145,14 +145,14 @@ export function useCouponList() {
 
   const handleCouponClick = (coupon) => {
     trackCouponClick(coupon);
-    // 业务逻辑...
+    // Business logic...
   };
 
   return { couponList, availableCoupons, loading, fetchCoupons, handleCouponClick };
 }
 ```
 
-## 示例3：Store 定义与使用
+## Example 3: Store Definition and Usage
 
 ```javascript
 // common/stores/useOrderStore.js
@@ -172,7 +172,7 @@ export const useOrderStore = defineStore('order', ({ state, commit }) => {
   return { orderList, currentOrder, setOrderList, setCurrentOrder };
 });
 
-// 在 composable 中使用
+// Using in a composable
 import { useOrderStore } from 'common/stores/useOrderStore';
 
 export function useOrderData() {
@@ -187,14 +187,14 @@ export function useOrderData() {
 }
 ```
 
-## 示例4：埋点函数定义与调用
+## Example 4: Track Function Definition and Invocation
 
 ```javascript
 // track/couponList.js
 import { newSendTrackEx, newSaTrack, saTrack } from 'common/services/sdk/export.js';
 
 /**
- * 优惠券列表页浏览埋点
+ * Coupon list page view tracking
  */
 export function trackPageView() {
   // #ifdef MP-WEIXIN
@@ -207,7 +207,7 @@ export function trackPageView() {
 }
 
 /**
- * 优惠券点击埋点
+ * Coupon click tracking
  */
 export function trackCouponClick(coupon) {
   // #ifdef MP-WEIXIN
@@ -220,7 +220,7 @@ export function trackCouponClick(coupon) {
 }
 ```
 
-## 示例5：监控上报集成
+## Example 5: Monitoring Integration
 
 ```javascript
 import { useMonitorReport } from 'tingyun/index.js';
@@ -232,7 +232,7 @@ export function useOrderSubmit() {
     try {
       monitorReport.info({
         name: 'order:submit:start',
-        message: '开始提交订单',
+        message: 'Starting order submission',
         orderId: orderInfo.id
       });
 
@@ -240,7 +240,7 @@ export function useOrderSubmit() {
 
       monitorReport.info({
         name: 'order:submit:success',
-        message: '订单提交成功',
+        message: 'Order submitted successfully',
         orderId: orderInfo.id
       });
 
@@ -248,7 +248,7 @@ export function useOrderSubmit() {
     } catch (error) {
       monitorReport.error({
         name: 'order:submit:error',
-        message: '订单提交失败',
+        message: 'Order submission failed',
         orderId: orderInfo.id,
         error: error.message,
         stack: error.stack

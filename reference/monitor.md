@@ -1,17 +1,17 @@
-# 听云监控完整 API 指南
+# Tingyun Monitoring Full API Guide
 
-## 核心 API
+## Core API
 
-### 1. 获取监控实例
+### 1. Get Monitoring Instance
 
 ```javascript
 import { getMonitorService } from 'tingyun/index.js';
 
-// 异步获取监控实例
+// Async get monitoring instance
 getMonitorService().then((service) => {
-    console.log('异常监控实例已获取', service);
+    console.log('Monitoring instance acquired', service);
 
-    // 设置全局上下文
+    // Set global context
     service.setContext({
         userId: '12345',
         version: '1.0.0'
@@ -19,15 +19,15 @@ getMonitorService().then((service) => {
 });
 ```
 
-**实现类**: `src/shares/common/sdk/monitor/base/TingyunMonitor.js`
+**Implementation Class**: `src/shares/common/sdk/monitor/base/TingyunMonitor.js`
 
-| 方法 | 说明 |
-|------|------|
-| `setContext(context)` | 设置全局异常监控上下文信息 |
-| `report(data)` | 上报异常监控信息 |
-| `reportError(error)` | 上报错误异常监控信息（基于 report 封装） |
+| Method | Description |
+|--------|-------------|
+| `setContext(context)` | Set global exception monitoring context info |
+| `report(data)` | Report exception monitoring info |
+| `reportError(error)` | Report error exception monitoring info (wrapped around report) |
 
-### 2. 使用 Hook 便捷上报
+### 2. Use Hook for Convenient Reporting
 
 ```javascript
 import { useMonitorReport } from 'tingyun/index.js';
@@ -39,7 +39,7 @@ export default {
         const handleError = () => {
             monitorReport.error({
                 name: 'OrderSubmitError',
-                message: '订单提交失败',
+                message: 'Order submission failed',
                 orderId: '123456',
                 errorCode: 500
             });
@@ -50,20 +50,20 @@ export default {
 };
 ```
 
-## 日志分级
+## Log Levels
 
-| 级别 | 方法 | 使用场景 |
-|------|------|---------|
-| `error` | `monitorReport.error()` | 系统错误、异常捕获 |
-| `warn` | `monitorReport.warn()` | 警告信息、潜在问题 |
-| `info` | `monitorReport.info()` | 业务关键信息 |
-| `debug` | `monitorReport.debug()` | 调试信息（开发环境） |
-| `log` | `monitorReport.log()` | 普通日志 |
+| Level | Method | Use Case |
+|-------|--------|----------|
+| `error` | `monitorReport.error()` | System errors, exception capture |
+| `warn` | `monitorReport.warn()` | Warnings, potential issues |
+| `info` | `monitorReport.info()` | Key business information |
+| `debug` | `monitorReport.debug()` | Debug info (development only) |
+| `log` | `monitorReport.log()` | General logging |
 
-### 分级上报示例
+### Leveled Reporting Example
 
 ```javascript
-// 定义异常类型枚举
+// Define exception type enum
 export const ExceptionType = {
     ORDER_SUBMIT_ERROR: 'orderSubmitError',
     PAYMENT_ERROR: 'paymentError',
@@ -71,12 +71,12 @@ export const ExceptionType = {
     NETWORK_ERROR: 'networkError'
 };
 
-// 业务代码中使用
+// Usage in business code
 const submitOrder = async () => {
     try {
         monitorReport.info({
             name: ExceptionType.ORDER_SUBMIT_ERROR,
-            message: '开始提交订单',
+            message: 'Starting order submission',
             orderId: orderInfo.id
         });
 
@@ -84,7 +84,7 @@ const submitOrder = async () => {
 
         monitorReport.info({
             name: ExceptionType.ORDER_SUBMIT_ERROR,
-            message: '订单提交成功',
+            message: 'Order submitted successfully',
             orderId: orderInfo.id,
             result
         });
@@ -92,7 +92,7 @@ const submitOrder = async () => {
     } catch (error) {
         monitorReport.error({
             name: ExceptionType.ORDER_SUBMIT_ERROR,
-            message: '订单提交失败',
+            message: 'Order submission failed',
             orderId: orderInfo.id,
             error: error.message,
             stack: error.stack
@@ -103,20 +103,20 @@ const submitOrder = async () => {
 };
 ```
 
-## 错误捕获
+## Error Capture
 
 ```javascript
-// 捕获异常并自动上报
-monitorReport.captureError(new Error('测试异常'));
+// Capture exception and auto-report
+monitorReport.captureError(new Error('Test exception'));
 
-// 捕获异步异常
+// Capture async exception
 try {
     await riskyOperation();
 } catch (error) {
     monitorReport.captureError(error);
 }
 
-// 在 Vue 组件中捕获
+// Capture in Vue component
 export default {
     methods: {
         async handleClick() {
@@ -133,7 +133,7 @@ export default {
 };
 ```
 
-## 业务监控 Hook 封装
+## Business Monitoring Hook Pattern
 
 ```javascript
 // src/composables/useBusinessMonitor.js
@@ -144,7 +144,7 @@ export function useBusinessMonitor() {
     const monitorReport = useMonitorReport();
 
     /**
-     * 监控 API 调用
+     * Monitor API call
      */
     const monitorApiCall = async (apiName, apiFunction, params = {}) => {
         const startTime = Date.now();
@@ -152,7 +152,7 @@ export function useBusinessMonitor() {
         try {
             monitorReport.info({
                 name: `api:${apiName}:start`,
-                message: `开始调用 ${apiName}`,
+                message: `Starting ${apiName} call`,
                 params
             });
 
@@ -161,7 +161,7 @@ export function useBusinessMonitor() {
 
             monitorReport.info({
                 name: `api:${apiName}:success`,
-                message: `${apiName} 调用成功`,
+                message: `${apiName} call succeeded`,
                 duration,
                 result
             });
@@ -173,7 +173,7 @@ export function useBusinessMonitor() {
 
             monitorReport.error({
                 name: `api:${apiName}:error`,
-                message: `${apiName} 调用失败`,
+                message: `${apiName} call failed`,
                 duration,
                 error: error.message,
                 stack: error.stack
@@ -184,24 +184,24 @@ export function useBusinessMonitor() {
     };
 
     /**
-     * 监控用户行为
+     * Monitor user action
      */
     const trackUserAction = (action, params = {}) => {
         monitorReport.log({
             name: `user:action:${action}`,
-            message: `用户执行 ${action}`,
+            message: `User performed ${action}`,
             action,
             params
         });
     };
 
     /**
-     * 监控页面性能
+     * Monitor page performance
      */
     const trackPagePerformance = (pageName, metrics = {}) => {
         monitorReport.info({
             name: `page:performance:${pageName}`,
-            message: `页面 ${pageName} 性能数据`,
+            message: `Page ${pageName} performance data`,
             pageName,
             metrics
         });
@@ -211,62 +211,62 @@ export function useBusinessMonitor() {
 }
 ```
 
-## 统一异常类型定义
+## Unified Exception Type Definitions
 
 ```javascript
 // src/constants/exceptionTypes.js
 export const ExceptionType = {
-    // 订单模块
+    // Order module
     ORDER_SUBMIT_ERROR: 'order:submitError',
     ORDER_PAY_ERROR: 'order:payError',
     ORDER_CANCEL_ERROR: 'order:cancelError',
 
-    // 支付模块
+    // Payment module
     PAYMENT_INIT_ERROR: 'payment:initError',
     PAYMENT_CONFIRM_ERROR: 'payment:confirmError',
 
-    // 优惠券模块
+    // Coupon module
     COUPON_FETCH_ERROR: 'coupon:fetchError',
     COUPON_APPLY_ERROR: 'coupon:applyError',
 
-    // 网络模块
+    // Network module
     NETWORK_TIMEOUT: 'network:timeout',
     NETWORK_OFFLINE: 'network:offline',
 
-    // 系统模块
+    // System module
     SYSTEM_STORAGE_ERROR: 'system:storageError',
     SYSTEM_LOCATION_ERROR: 'system:locationError'
 };
 ```
 
-## 相关文件
+## Related Files
 
-| 文件 | 说明 |
-|------|------|
-| `tingyun/index.js` | SDK 入口，提供 `getMonitorService` 和 `useMonitorReport` |
-| `src/shares/common/sdk/monitor/base/TingyunMonitor.js` | 监控核心实现类 |
+| File | Description |
+|------|-------------|
+| `tingyun/index.js` | SDK entry, provides `getMonitorService` and `useMonitorReport` |
+| `src/shares/common/sdk/monitor/base/TingyunMonitor.js` | Monitoring core implementation class |
 
-## 注意事项
+## Notes
 
-1. **异步初始化**：`getMonitorService()` 返回 Promise，确保调用前已初始化完成
-2. **错误处理**：监控上报不应阻塞业务流程，建议用 try-catch 包裹
-3. **性能考虑**：高频操作（如滚动、点击）不要频繁上报，需要节流
-4. **隐私合规**：上报数据不要包含敏感信息（如密码、手机号）
-5. **生产环境**：开发环境可开启详细日志，生产环境建议只上报 error 级别
+1. **Async initialization**: `getMonitorService()` returns a Promise, ensure initialization is complete before calling
+2. **Error handling**: Monitoring reports should not block business flow, recommend wrapping in try-catch
+3. **Performance considerations**: High-frequency operations (scrolling, clicking) should not report frequently, need throttling
+4. **Privacy compliance**: Report data must not contain sensitive information (passwords, phone numbers)
+5. **Production environment**: Detailed logs can be enabled in development, recommend only error-level reporting in production
 
-## 快速开始
+## Quick Start
 
 ```javascript
-// 1. 引入 Hook
+// 1. Import Hook
 import { useMonitorReport } from 'tingyun/index.js';
 
-// 2. 在组件中使用
+// 2. Use in component
 export default {
     setup() {
         const monitorReport = useMonitorReport();
 
         const handleError = (error) => {
-            // 3. 上报错误
+            // 3. Report error
             monitorReport.error({
                 name: 'BusinessError',
                 message: error.message,

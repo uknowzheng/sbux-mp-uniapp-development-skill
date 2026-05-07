@@ -1,146 +1,146 @@
-# /use-sbux-mp - 端到端业务功能开发
+# /use-sbux-mp - End-to-End Business Feature Development
 
-根据业务需求描述，按照项目全量规范，开发一个完整的页面功能模块。
+Develop a complete page feature module based on business requirements, following all project standards.
 
-## 开发流程
+## Development Workflow
 
-### Step 1: 分析需求，拆解模块
+### Step 1: Analyze Requirements, Decompose Modules
 
-收到业务需求后，先拆解为以下模块并确定是否需要：
+After receiving business requirements, decompose into the following modules and determine if needed:
 
-| 模块 | 是否需要 | 判断依据 |
-|------|---------|---------|
-| Service | 有新接口 → 需要 | 读取 [reference/services.md](../reference/services.md) |
-| Store | 有跨页面状态 → 需要 | 读取 [reference/store.md](../reference/store.md) |
-| Transaction Store | 购物车/门店/交易 → 需要 | 读取 [reference/transaction-store.md](../reference/transaction-store.md) |
-| SharedCache | 跨页面临时数据传递 → 需要 | 读取 [reference/shared-cache.md](../reference/shared-cache.md) |
-| Composable | 有业务逻辑 → 必须 | 读取 [reference/composables.md](../reference/composables.md) |
-| Component | 有可复用 UI 块 → 需要 | 读取 [reference/component.md](../reference/component.md) |
-| Dialog | 有弹窗交互 → 需要 | 读取 [reference/dialog.md](../reference/dialog.md) |
-| Track | 有埋点需求 → 需要 | SKILL.md 第 9 节 |
-| Monitor | 关键业务流程 → 需要 | 读取 [reference/monitor.md](../reference/monitor.md) |
-| Static Assets | 有新图片资源 → 需要 | 读取 [reference/static-assets.md](../reference/static-assets.md) |
+| Module | Needed When | Decision Criteria | Read File |
+|--------|------------|-------------------|-----------|
+| Service | New API → needed | Read [reference/services.md](../reference/services.md) |
+| Store | Cross-page state → needed | Read [reference/store.md](../reference/store.md) |
+| Transaction Store | Cart/store/transaction → needed | Read [reference/transaction-store.md](../reference/transaction-store.md) |
+| SharedCache | Cross-page temporary data passing → needed | Read [reference/shared-cache.md](../reference/shared-cache.md) |
+| Composable | Has business logic → required | Read [reference/composables.md](../reference/composables.md) |
+| Component | Has reusable UI blocks → needed | Read [reference/component.md](../reference/component.md) |
+| Dialog | Has dialog interactions → needed | Read [reference/dialog.md](../reference/dialog.md) |
+| Track | Has tracking requirements → needed | SKILL.md Section 9 |
+| Monitor | Key business flows → needed | Read [reference/monitor.md](../reference/monitor.md) |
+| Static Assets | Has new image assets → needed | Read [reference/static-assets.md](../reference/static-assets.md) |
 
-**输出**：列出本次需要创建/修改的文件清单及依赖关系。
+**Output**: List the files to be created/modified and their dependency relationships.
 
-### Step 2: 自底向上创建，按依赖顺序
+### Step 2: Create Bottom-Up, in Dependency Order
 
-严格按以下顺序创建文件（上层依赖下层）：
+Strictly create files in the following order (upper layers depend on lower layers):
 
 ```
-Service → Store/SharedCache → Composable → Component → Page → Route注册
+Service → Store/SharedCache → Composable → Component → Page → Route Registration
 ```
 
-#### 2.1 Service 层（如有新接口）
+#### 2.1 Service Layer (If New API)
 
-1. 创建 `src/services/[domain]/api.js` — 定义接口路径
-2. 创建 `src/services/[domain]/index.js` — 函数式写法导出
-3. 多渠道 → 创建 `xxx.weixin.js` / `xxx.h5.js` + 分流入口
-4. 注册到 `src/services/index.js`
+1. Create `src/services/[domain]/api.js` — define API paths
+2. Create `src/services/[domain]/index.js` — functional style exports
+3. Multi-channel → create `xxx.weixin.js` / `xxx.h5.js` + routing entry
+4. Register in `src/services/index.js`
 
-#### 2.2 Store / SharedCache 层（如有跨页面状态）
+#### 2.2 Store / SharedCache Layer (If Cross-Page State)
 
-**Store**（响应式状态）：
-1. 创建 `common/stores/use[Xxx]Store.js` — defineStore 写法
-2. 交易相关 → 使用 `useCartStore` / `useShopStore` / `useTransactionStore`
+**Store** (reactive state):
+1. Create `common/stores/use[Xxx]Store.js` — defineStore pattern
+2. Transaction-related → use `useCartStore` / `useShopStore` / `useTransactionStore`
 
-**SharedCache**（轻量临时缓存）：
-1. 创建 `common/sharedCache/modules/[name].js` — defineCache 写法
+**SharedCache** (lightweight temporary cache):
+1. Create `common/sharedCache/modules/[name].js` — defineCache pattern
 
-#### 2.3 Composable 层（必须有）
+#### 2.3 Composable Layer (Required)
 
-1. 创建子 composables `composables/use[Feature]Data.js` / `use[Feature]Logic.js` / `use[Feature]Track.js`
-2. 创建主 composable `use[PageName].js` — 管理生命周期 + 协调子 composables
-3. **约束**：子 composable 严禁生命周期，跨 composable 的 watch 只在主 composable
+1. Create sub-composables `composables/use[Feature]Data.js` / `use[Feature]Logic.js` / `use[Feature]Track.js`
+2. Create main composable `use[PageName].js` — manage lifecycle + coordinate sub-composables
+3. **Constraint**: Sub-composables must not contain lifecycles, cross-composable watches only in main composable
 
-#### 2.4 Component 层（如有可复用 UI）
+#### 2.4 Component Layer (If Reusable UI)
 
-1. 创建 `components/[componentName]/index.vue`
-2. 复杂组件 → 加 `use[ComponentName].js`
-3. 弹窗 → 使用 `useAlertDialog` / `useSlideDialog` / `usePromptDialog`
-4. 图片 → 使用 `imgUrl()`
+1. Create `components/[componentName]/index.vue`
+2. Complex component → add `use[ComponentName].js`
+3. Dialog → use `useAlertDialog` / `useSlideDialog` / `usePromptDialog`
+4. Images → use `imgUrl()`
 
-#### 2.5 Page 层（必须有）
+#### 2.5 Page Layer (Required)
 
-1. 创建页面目录 `pages/[pageName]/index.vue` + `use[PageName].js` + `composables/`
-2. 旧页面 → 同级创建同名目录，`.vue` 保持不变
-3. Vue 写法：无 `#ifdef` → `<script setup>`；有 `#ifdef` → Options `setup()`
-4. 声明空生命周期：`onReachBottom` / `onShareAppMessage` / `onPullDownRefresh` / `onPageScroll`
+1. Create page directory `pages/[pageName]/index.vue` + `use[PageName].js` + `composables/`
+2. Legacy page → create same-name directory at same level, keep `.vue` unchanged
+3. Vue pattern: no `#ifdef` → `<script setup>`; with `#ifdef` → Options `setup()`
+4. Declare empty lifecycles: `onReachBottom` / `onShareAppMessage` / `onPullDownRefresh` / `onPageScroll`
 
-#### 2.6 Track 层（如有埋点）
+#### 2.6 Track Layer (If Tracking)
 
-1. 创建 `[package]/track/[pageName].js` — 封装埋点函数
-2. 命名：`track[Element]Click` / `track[Element]Expose` / `trackPageView`
-3. 平台差异 `#ifdef` 在 track 函数内部处理
-4. 在 composable 中调用 track 函数
+1. Create `[package]/track/[pageName].js` — encapsulate tracking functions
+2. Naming: `track[Element]Click` / `track[Element]Expose` / `trackPageView`
+3. Platform differences `#ifdef` handled inside track functions
+4. Call track functions in composables
 
-#### 2.7 Monitor 层（关键业务流程）
+#### 2.7 Monitor Layer (Key Business Flows)
 
-1. 引入 `useMonitorReport` from `tingyun/index.js`
-2. 关键节点上报：`monitorReport.info()`（开始） / `monitorReport.error()`（失败）
-3. 上报不阻塞业务，高频操作需节流
+1. Import `useMonitorReport` from `tingyun/index.js`
+2. Report at key points: `monitorReport.info()` (start) / `monitorReport.error()` (failure)
+3. Reporting must not block business, throttle high-frequency operations
 
-### Step 3: 注册路由
+### Step 3: Register Routes
 
-1. 在 `pages.config.js` 中添加页面路径
-2. 在 `common/router.config.js` 中添加路由常量（按分包分组）
-3. 使用 `navigateTo({ url: XXX.pageName })` 跳转，禁止硬编码
+1. Add page path in `pages.config.js`
+2. Add route constant in `common/router.config.js` (grouped by package)
+3. Use `navigateTo({ url: XXX.pageName })` for navigation, no hardcoding
 
-### Step 4: 自查清单
+### Step 4: Self-Check Checklist
 
-逐项确认以下规范是否全部满足：
+Verify each of the following standards is fully satisfied:
 
-| # | 检查项 | 规范来源 |
-|---|--------|---------|
-| 1 | 文件和目录命名全部 camelCase | SKILL.md 第 1 节 |
-| 2 | Hook 命名 use + PascalCase，命名导出 | SKILL.md 第 1 节 |
-| 3 | 组件用目录形式，主组件 index.vue | SKILL.md 第 2 节 |
-| 4 | 子 composable 无生命周期 | SKILL.md 第 4 节 |
-| 5 | 跨 composable 的 watch 只在主 composable | SKILL.md 第 4 节 |
-| 6 | Store 用 defineStore，禁止直接赋值 .value | SKILL.md 第 8 节 |
-| 7 | Service 只做请求+简单转换，禁止路由/复杂逻辑 | SKILL.md 第 7 节 |
-| 8 | 路由使用常量，禁止硬编码路径 | SKILL.md 第 6 节 |
-| 9 | 图片使用 imgUrl() | SKILL.md 第 8.8 节 |
-| 10 | 埋点封装成函数，按页面拆分 | SKILL.md 第 9 节 |
-| 11 | 需手动声明的生命周期在 .vue 中声明空方法 | SKILL.md 第 3 节 |
-| 12 | 平台差异用 #ifdef，不在业务逻辑中散落 | SKILL.md 第 7/9 节 |
+| # | Check Item | Spec Source |
+|---|-----------|-------------|
+| 1 | All file and directory naming is camelCase | SKILL.md Section 1 |
+| 2 | Hook naming use + PascalCase, named exports | SKILL.md Section 1 |
+| 3 | Components use directory form, main component index.vue | SKILL.md Section 2 |
+| 4 | Sub-composables have no lifecycles | SKILL.md Section 4 |
+| 5 | Cross-composable watches only in main composable | SKILL.md Section 4 |
+| 6 | Store uses defineStore, direct .value assignment prohibited | SKILL.md Section 8 |
+| 7 | Service only does requests + simple transforms, no routing/complex logic | SKILL.md Section 7 |
+| 8 | Routes use constants, no hardcoded paths | SKILL.md Section 6 |
+| 9 | Images use imgUrl() | SKILL.md Section 8.8 |
+| 10 | Tracking encapsulated as functions, split by page | SKILL.md Section 9 |
+| 11 | Lifecycles requiring manual declaration have empty methods in .vue | SKILL.md Section 3 |
+| 12 | Platform differences use #ifdef, not scattered in business logic | SKILL.md Section 7/9 |
 
-## 输出格式
+## Output Format
 
-完成开发后，输出以下内容：
+After completing development, output the following:
 
 ```markdown
-## 功能模块：[业务功能名]
+## Feature Module: [Business Feature Name]
 
-### 文件清单
-| 文件路径 | 类型 | 说明 |
-|---------|------|------|
-| src/services/xxx/api.js | Service | API 定义 |
-| src/services/xxx/index.js | Service | 服务方法 |
+### File List
+| File Path | Type | Description |
+|-----------|------|-------------|
+| src/services/xxx/api.js | Service | API definitions |
+| src/services/xxx/index.js | Service | Service methods |
 | ... | ... | ... |
 
-### 依赖关系
+### Dependency Relationships
 Service ← Store/Cache ← Composable ← Component ← Page
 
-### 路由注册
-- pages.config.js: 添加路径
-- router.config.js: 添加常量
+### Route Registration
+- pages.config.js: added path
+- router.config.js: added constant
 
-### 自查结果
-- [x] 全部 12 项检查通过
+### Self-Check Results
+- [x] All 12 check items passed
 ```
 
-## 详细参考
+## Detailed Reference
 
-按需读取以下 reference 文件获取完整规范：
+Read the following reference files on demand for complete standards:
 
-→ [reference/services.md](../reference/services.md) — 服务层完整指南 + 多渠道分流
-→ [reference/store.md](../reference/store.md) — Store 完整用法
+→ [reference/services.md](../reference/services.md) — Service layer full guide + multi-channel routing
+→ [reference/store.md](../reference/store.md) — Store full usage
 → [reference/transaction-store.md](../reference/transaction-store.md) — Transaction Store
-→ [reference/shared-cache.md](../reference/shared-cache.md) — 跨页面共享缓存
-→ [reference/composables.md](../reference/composables.md) — 主/子 composable 完整架构
-→ [reference/component.md](../reference/component.md) — 组件完整写法
-→ [reference/dialog.md](../reference/dialog.md) — 弹窗 Composables
-→ [reference/static-assets.md](../reference/static-assets.md) — 静态资源 imgUrl
-→ [reference/monitor.md](../reference/monitor.md) — 监控上报完整 API
-→ [reference/deployment.md](../reference/deployment.md) — 构建部署
+→ [reference/shared-cache.md](../reference/shared-cache.md) — Cross-page shared cache
+→ [reference/composables.md](../reference/composables.md) — Main/sub composable full architecture
+→ [reference/component.md](../reference/component.md) — Component full patterns
+→ [reference/dialog.md](../reference/dialog.md) — Dialog Composables
+→ [reference/static-assets.md](../reference/static-assets.md) — Static assets imgUrl
+→ [reference/monitor.md](../reference/monitor.md) — Monitoring full API
+→ [reference/deployment.md](../reference/deployment.md) — Build & deploy

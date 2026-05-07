@@ -1,24 +1,24 @@
-# 组件完整开发指南
+# Component Full Development Guide
 
-## 复杂页面组件拆分模式
+## Complex Page Component Splitting Patterns
 
-对于复杂页面（如支付页），组件拆分为以下几类：
+For complex pages (e.g., payment page), components are split into the following categories:
 
-### 1. 业务逻辑组件
+### 1. Business Logic Components
 
 ```bash
 components/
-├── paymentList/           # 支付方式列表
+├── paymentList/           # Payment method list
 │   └── index.vue
-├── orderType/             # 订单类型选择（即刻取单/预约取单）
+├── orderType/             # Order type selection (immediate/scheduled pickup)
 │   └── index.vue
-├── address/               # 地址选择（门店/配送地址）
+├── address/               # Address selection (store/delivery address)
 │   └── index.vue
-└── submit/                # 提交按钮区域
+└── submit/                # Submit button area
     └── index.vue
 ```
 
-**示例：paymentList 组件**
+**Example: paymentList Component**
 
 ```vue
 <!-- components/paymentList/index.vue -->
@@ -35,7 +35,7 @@ components/
       <view class="payment-info">
         <text class="payment-name">{{ method.paymentMethodName }}</text>
         <text v-if="method.balance" class="payment-balance">
-          余额: ¥{{ formatAmount(method.balance) }}
+          Balance: ¥{{ formatAmount(method.balance) }}
         </text>
       </view>
       <view class="check-icon" v-if="selectedCode === method.paymentMethodCode">
@@ -87,21 +87,21 @@ export default {
 </style>
 ```
 
-### 2. 交互组件（Popups/Modals）
+### 2. Interactive Components (Popups/Modals)
 
 ```bash
 components/
-├── SVCCardListPopup/      # 星礼卡列表弹窗
+├── SVCCardListPopup/      # SVC card list popup
 │   └── index.vue
-├── PayMethodPopup/        # 支付方式弹窗
+├── PayMethodPopup/        # Payment method popup
 │   └── index.vue
-├── CompleteAddressDialog/ # 地址补全弹窗
+├── CompleteAddressDialog/ # Address completion dialog
 │   └── index.vue
-└── OtherStoreConfimPopup/ # 跨门店确认弹窗
+└── OtherStoreConfimPopup/ # Cross-store confirmation popup
     └── index.vue
 ```
 
-**弹窗组件设计模式**：支持 open/close 方法，通过 ref 调用
+**Dialog Component Design Pattern**: Support open/close methods, call via ref
 
 ```vue
 <!-- components/SVCCardListPopup/index.vue -->
@@ -109,7 +109,7 @@ components/
   <uni-popup ref="popup" type="bottom" @change="onPopupChange">
     <view class="svc-card-popup">
       <view class="popup-header">
-        <text class="title">选择星礼卡</text>
+        <text class="title">Select SVC Card</text>
         <text class="close-btn" @click="close">×</text>
       </view>
       <scroll-view class="card-list" scroll-y>
@@ -149,24 +149,24 @@ export default {
 </script>
 ```
 
-### 3. 容器组件
+### 3. Container Components
 
-布局和样式容器，如 `addressAndOrderContain`、`scrollFloatButton`
+Layout and style containers, e.g., `addressAndOrderContain`, `scrollFloatButton`
 
-### 4. 选项行组件
+### 4. Option Row Components
 
 ```bash
 components/
 └── optionRow/
     ├── index.vue
-    ├── priceRow.vue          # 价格行
-    ├── radioRow.vue          # 单选行
-    └── selectRow.vue         # 选择行
+    ├── priceRow.vue          # Price row
+    ├── radioRow.vue          # Radio row
+    └── selectRow.vue         # Select row
 ```
 
-## 复杂组件带 Hook 模式
+## Complex Component with Hook Pattern
 
-### Hook 文件
+### Hook File
 
 ```javascript
 // components/orderDetailPanel/useOrderDetailPanel.js
@@ -207,7 +207,7 @@ export function useOrderDetailPanel(props, emit) {
 }
 ```
 
-### 组件文件
+### Component File
 
 ```vue
 <!-- components/orderDetailPanel/index.vue -->
@@ -247,15 +247,15 @@ export default {
 </script>
 ```
 
-## 最佳实践总结
+## Best Practices Summary
 
-1. **目录形式**：所有组件使用目录形式，主组件命名 `index.vue`
-2. **Hook 命名**：`use[ComponentName].js` 用于复杂组件
-3. **Props 验证**：使用正确的 prop 类型和验证
-4. **事件发射**：使用 emit 进行父组件通信
-5. **Slot 使用**：使用 slots 提供灵活内容
-6. **Scoped 样式**：始终使用 scoped 样式
-7. **性能**：避免不必要的 re-render，使用 computed 属性
-8. **复杂组件拆分**：按功能模块拆分（paymentList、orderType、address 等）
-9. **弹窗组件**：支持 open/close 方法，通过 ref 调用
-10. **图片兜底**：使用 imgUrl 函数，在图片加载失败时提供兜底图
+1. **Directory form**: All components use directory form, main component named `index.vue`
+2. **Hook naming**: `use[ComponentName].js` for complex components
+3. **Props validation**: Use correct prop types and validation
+4. **Event emission**: Use emit for parent component communication
+5. **Slot usage**: Use slots for flexible content
+6. **Scoped styles**: Always use scoped styles
+7. **Performance**: Avoid unnecessary re-renders, use computed properties
+8. **Complex component splitting**: Split by functional module (paymentList, orderType, address, etc.)
+9. **Dialog components**: Support open/close methods, call via ref
+10. **Image fallback**: Use imgUrl function for image loading failure fallback

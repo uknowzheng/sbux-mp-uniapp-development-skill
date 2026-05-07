@@ -1,44 +1,44 @@
-# /component - 新建组件开发
+# /component - Create New Component
 
-## 开发流程
+## Development Workflow
 
-### Step 1: 确定组件类型
+### Step 1: Determine Component Type
 
-| 类型 | 目录结构 | 适用场景 |
-|------|---------|---------|
-| 简单组件 | `cardItem/index.vue` | 纯展示/交互 |
-| 复杂组件 | `orderDetailPanel/index.vue` + `useOrderDetailPanel.js` | 有状态逻辑 |
-| 组件组 | `svcPay/payMent.vue` + `payPop.vue` + ... | 多个关联子组件 |
+| Type | Directory Structure | Use Case |
+|------|-------------------|----------|
+| Simple component | `cardItem/index.vue` | Display/interaction only |
+| Complex component | `orderDetailPanel/index.vue` + `useOrderDetailPanel.js` | Has state logic |
+| Component group | `svcPay/payMent.vue` + `payPop.vue` + ... | Multiple related sub-components |
 
-### Step 2: 创建组件目录
+### Step 2: Create Component Directory
 
 ```bash
 components/
 └── [componentName]/         # camelCase
-    ├── index.vue            # 主组件
-    └── use[ComponentName].js # 复杂组件才需要
+    ├── index.vue            # Main component
+    └── use[ComponentName].js # Only needed for complex components
 ```
 
-### Step 3: 编写组件
+### Step 3: Write Component
 
-- **简单组件**：props 传数据 + `$emit` 传事件，scoped 样式
-- **复杂组件**：提取 hook（`use[ComponentName].js`），setup 中 `return useXxx(props, emit)`
-- **弹窗组件**：支持 open/close 方法，通过 ref 调用（详见 [reference/dialog.md](../reference/dialog.md)）
+- **Simple component**: Pass data via props + `$emit` for events, scoped styles
+- **Complex component**: Extract hook (`use[ComponentName].js`), `return useXxx(props, emit)` in setup
+- **Dialog component**: Support open/close methods, call via ref (see [reference/dialog.md](../reference/dialog.md))
 
-### Step 4: 使用组件
+### Step 4: Use Component
 
-在页面中导入使用，通过 props 传数据，$emit 传事件。图片使用 `imgUrl` 函数。
+Import and use in the page. Pass data via props, events via $emit. Use `imgUrl` for images.
 
-## 关键约束
+## Key Constraints
 
-1. 所有组件用目录形式，主组件命名 `index.vue`
-2. Props 传递数据，避免过度依赖全局状态
-3. $emit 事件，保持单向数据流
-4. Scoped 样式，避免样式污染
-5. 图片兜底：使用 `imgUrl` 函数（详见 [reference/static-assets.md](../reference/static-assets.md)）
-6. 弹窗组件：支持 open/close 方法，通过 ref 调用
+1. All components use directory form, main component named `index.vue`
+2. Pass data via props, avoid over-reliance on global state
+3. Use $emit for events, maintain unidirectional data flow
+4. Use scoped styles to avoid style pollution
+5. Image fallback: use `imgUrl` function (see [reference/static-assets.md](../reference/static-assets.md))
+6. Dialog components: support open/close methods, call via ref
 
-## 详细参考
+## Detailed Reference
 
-→ 读取 [reference/component.md](../reference/component.md) 获取复杂组件完整写法与示例
-→ 读取 [reference/dialog.md](../reference/dialog.md) 获取弹窗 Composables 使用指南
+→ Read [reference/component.md](../reference/component.md) for complex component full patterns and examples
+→ Read [reference/dialog.md](../reference/dialog.md) for Dialog Composables usage guide

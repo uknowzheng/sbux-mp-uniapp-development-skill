@@ -1,66 +1,66 @@
-# 构建部署完整指南
+# Build & Deploy Full Guide
 
-## 当前构建体系
+## Current Build System
 
-### package.json Scripts 结构
+### package.json Scripts Structure
 
 ```bash
-# 多平台小程序构建
-app:dev:mp-weixin      # 微信小程序开发
-app:stg:mp-weixin      # 微信小程序测试
-app:prod:mp-weixin     # 微信小程序生产
-app:dev:mp-alipay      # 支付宝小程序
-app:dev:mp-toutiao     # 抖音小程序
+# Multi-platform mini-program builds
+app:dev:mp-weixin      # WeChat mini-program development
+app:stg:mp-weixin      # WeChat mini-program staging
+app:prod:mp-weixin     # WeChat mini-program production
+app:dev:mp-alipay      # Alipay mini-program
+app:dev:mp-toutiao     # Douyin mini-program
 
-# H5 多业务线构建
-dev:h5-module-config   # H5 模块配置开发
-stg:h5-module-config   # H5 模块配置测试
-dev:h5-generalActivity # H5 通用活动
-dev:h5-loyalty         # H5 会员夜
+# H5 multi-business-line builds
+dev:h5-module-config   # H5 module config development
+stg:h5-module-config   # H5 module config staging
+dev:h5-generalActivity # H5 general activity
+dev:h5-loyalty         # H5 loyalty
 
-# 电子券/票
+# Electronic coupon/ticket
 dev:ele-coupon
 stg:ele-coupon
 
-# 定制化业务（离线包）
+# Customization business (offline package)
 dev:h5-customization-mod
 dev:h5-customization-mop
 stg:customization-mod
 build:customization-mod
 ```
 
-### build-script 核心流程
+### build-script Core Flow
 
-`build-script/platform-builder.js` 核心逻辑：
+`build-script/platform-builder.js` core logic:
 
-1. 读取环境变量
+1. Read environment variables
    - `NODE_CUSTOM_ENV`: dev/stg/prod
    - `TARGET_PLATFORM`: mp-weixin/mp-alipay/h5-xxx
-   - `BUILD_TYPE`: OfflinePackage（可选）
-   - `CURR_MACHINE`: android/ios（离线包）
-   - `BUSINESS_TYPE`: MOD/MOP（离线包）
+   - `BUILD_TYPE`: OfflinePackage (optional)
+   - `CURR_MACHINE`: android/ios (offline package)
+   - `BUSINESS_TYPE`: MOD/MOP (offline package)
 
-2. 构建流程
-   - 执行平台特定构建脚本
-   - 生成 pages.json、manifest.json
-   - 复制 share modules
-   - 执行 Vue CLI 构建
+2. Build process
+   - Execute platform-specific build scripts
+   - Generate pages.json, manifest.json
+   - Copy share modules
+   - Execute Vue CLI build
 
-3. 输出到 `dist/` 目录
+3. Output to `dist/` directory
 
-## 环境变量
+## Environment Variables
 
-| 变量 | 说明 | 示例 |
-|------|------|------|
-| `NODE_CUSTOM_ENV` | 环境标识 | dev / stg / prod |
-| `UNI_PLATFORM` | 平台标识 | mp-weixin / mp-alipay / h5-xxx |
-| `BUILD_TYPE` | 构建类型 | OfflinePackage（可选） |
-| `CURR_MACHINE` | 设备类型 | android / ios（离线包） |
-| `BUSINESS_TYPE` | 业务类型 | MOD / MOP（离线包） |
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `NODE_CUSTOM_ENV` | Environment identifier | dev / stg / prod |
+| `UNI_PLATFORM` | Platform identifier | mp-weixin / mp-alipay / h5-xxx |
+| `BUILD_TYPE` | Build type | OfflinePackage (optional) |
+| `CURR_MACHINE` | Device type | android / ios (offline package) |
+| `BUSINESS_TYPE` | Business type | MOD / MOP (offline package) |
 
-## CI/CD 流水线设计
+## CI/CD Pipeline Design
 
-### GitHub Actions 工作流
+### GitHub Actions Workflow
 
 ```yaml
 # .github/workflows/deploy-pipeline.yml
@@ -73,7 +73,7 @@ on:
     branches: [develop, main]
 
 jobs:
-  # 阶段1: 代码质量检查
+  # Stage 1: Code quality checks
   lint-and-test:
     runs-on: ubuntu-latest
     steps:
@@ -90,7 +90,7 @@ jobs:
       - name: Run Unit Tests
         run: pnpm vitest run --coverage
 
-  # 阶段2: 构建并预览（PR时）
+  # Stage 2: Build and preview (on PR)
   build-preview:
     if: github.event_name == 'pull_request'
     needs: lint-and-test
@@ -111,7 +111,7 @@ jobs:
       - name: Build ${{ matrix.platform }}
         run: pnpm run app:${{ matrix.env }}:${{ matrix.platform }}
 
-  # 阶段3: 部署到测试环境
+  # Stage 3: Deploy to staging
   deploy-staging:
     if: github.ref == 'refs/heads/develop'
     needs: lint-and-test
@@ -130,7 +130,7 @@ jobs:
       - name: Build H5
         run: pnpm run stg:h5-module-config
 
-  # 阶段4: 部署到生产环境（需人工审批）
+  # Stage 4: Deploy to production (requires manual approval)
   deploy-production:
     if: github.ref == 'refs/heads/main'
     needs: lint-and-test
@@ -152,15 +152,15 @@ jobs:
           pnpm run app:prod:mp-alipay
 ```
 
-### 部署脚本示例
+### Deployment Script Example
 
 ```bash
 #!/bin/bash
 # scripts/release-miniprogram.sh
 
-echo "开始发布小程序..."
+echo "Starting mini-program release..."
 
-# 微信小程序
+# WeChat mini-program
 npx miniprogram-ci upload \
   --appid $WECHAT_APPID \
   --private-key $WECHAT_PRIVATE_KEY \
@@ -168,19 +168,19 @@ npx miniprogram-ci upload \
   --version $(node -p "require('./package.json').version") \
   --desc "Production Release"
 
-# 支付宝小程序
+# Alipay mini-program
 npx minidev upload \
   --app-id $ALIPAY_APPID \
   --private-key $ALIPAY_PRIVATE_KEY \
   --project dist/build/mp-alipay \
   --version $(node -p "require('./package.json').version")
 
-echo "发布完成！"
+echo "Release complete!"
 ```
 
-## 最佳实践
+## Best Practices
 
-1. **分支策略**: main(生产) → develop(测试) → feature/*(功能) → hotfix/*(紧急修复)
-2. **自动化检查**: 所有 PR 必须通过 CI、ESLint 零错误
-3. **安全策略**: 生产部署需人工审批，Secrets 用 GitHub Secrets 管理
-4. **回滚机制**: 保留最近 10 个版本构建产物，支持一键回滚
+1. **Branch Strategy**: main(production) → develop(staging) → feature/*(feature) → hotfix/*(hotfix)
+2. **Automated Checks**: All PRs must pass CI, ESLint zero errors
+3. **Security Policy**: Production deployments require manual approval, Secrets managed via GitHub Secrets
+4. **Rollback Mechanism**: Keep last 10 version build artifacts, support one-click rollback

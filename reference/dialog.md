@@ -1,18 +1,18 @@
-# 弹窗 Composables 使用指南
+# Dialog Composables Usage Guide
 
-项目提供三个弹窗 Composables，统一管理各类弹窗交互。
+The project provides three Dialog Composables for unified management of dialog interactions.
 
-| Composable | 组件 | 用途 |
-|-----------|------|------|
-| `useAlertDialog` | `uni-alert` | 确认/取消类弹窗 |
-| `useSlideDialog` | `slide-dialog` | 信息展示类弹窗 |
-| `usePromptDialog` | `uni-prompt` | 多按钮选择类弹窗 |
+| Composable | Component | Usage |
+|-----------|-----------|-------|
+| `useAlertDialog` | `uni-alert` | Confirm/cancel dialogs |
+| `useSlideDialog` | `slide-dialog` | Information display dialogs |
+| `usePromptDialog` | `uni-prompt` | Multi-button selection dialogs |
 
-**核心优势**：一个组件多次复用 / 支持回调和 Promise 两种模式 / 状态自动管理
+**Core Advantages**: One component reused multiple times / Supports both callback and Promise modes / Automatic state management
 
 ## useAlertDialog
 
-### 引入与初始化
+### Import and Initialize
 
 ```javascript
 import { useAlertDialog } from 'common/composables/useAlertDialog.js';
@@ -20,7 +20,7 @@ import { useAlertDialog } from 'common/composables/useAlertDialog.js';
 const { alertState, showAlert, handleAlertConfirm, handleAlertCancel } = useAlertDialog();
 ```
 
-### 模板中定义组件（只需一次）
+### Define Component in Template (Only Once)
 
 ```vue
 <uni-alert
@@ -37,41 +37,41 @@ const { alertState, showAlert, handleAlertConfirm, handleAlertCancel } = useAler
 
 ### showAlert(options)
 
-| 参数 | 类型 | 默认值 | 说明 |
-|-----|------|--------|------|
-| title | String/Boolean | false | 弹窗标题 |
-| content | String/Boolean | true | 弹窗内容 |
-| cancelEnable | Boolean | true | 是否显示取消按钮 |
-| cancelText | String | '取消' | 取消按钮文案 |
-| confirmText | String | '确认' | 确认按钮文案 |
-| onConfirm | Function | - | 确认回调（回调模式） |
-| onCancel | Function | - | 取消回调（回调模式） |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| title | String/Boolean | false | Dialog title |
+| content | String/Boolean | true | Dialog content |
+| cancelEnable | Boolean | true | Whether to show cancel button |
+| cancelText | String | 'Cancel' | Cancel button text |
+| confirmText | String | 'Confirm' | Confirm button text |
+| onConfirm | Function | - | Confirm callback (callback mode) |
+| onCancel | Function | - | Cancel callback (callback mode) |
 
-**返回值**：
-- 回调模式（传入 onConfirm/onCancel）：无返回值
-- Promise 模式（不传回调）：返回 `Promise<Boolean>`
+**Return Value**:
+- Callback mode (pass onConfirm/onCancel): No return value
+- Promise mode (no callbacks passed): Returns `Promise<Boolean>`
 
-### 使用场景
+### Usage Examples
 
 ```javascript
-// 基础提示
-showAlert({ title: '提示', content: '操作成功', cancelEnable: false });
+// Basic notification
+showAlert({ title: 'Notice', content: 'Operation successful', cancelEnable: false });
 
-// 删除确认（回调模式）
+// Delete confirmation (callback mode)
 showAlert({
-    title: '删除确认',
-    content: '确定要删除吗？',
-    onConfirm: () => { /* 执行删除 */ },
+    title: 'Delete Confirmation',
+    content: 'Are you sure you want to delete?',
+    onConfirm: () => { /* Execute delete */ },
 });
 
-// Promise 模式
-const confirmed = await showAlert({ title: '清空购物车', content: '确定要清空吗？', cancelEnable: true });
-if (confirmed) { /* 执行清空 */ }
+// Promise mode
+const confirmed = await showAlert({ title: 'Clear Cart', content: 'Are you sure?', cancelEnable: true });
+if (confirmed) { /* Execute clear */ }
 ```
 
 ## useSlideDialog
 
-### 引入与初始化
+### Import and Initialize
 
 ```javascript
 import { useSlideDialog } from 'common/composables/useSlideDialog.js';
@@ -79,7 +79,7 @@ import { useSlideDialog } from 'common/composables/useSlideDialog.js';
 const { dialogState, showDialog } = useSlideDialog();
 ```
 
-### 模板中定义组件
+### Define Component in Template
 
 ```vue
 <slide-dialog
@@ -92,28 +92,28 @@ const { dialogState, showDialog } = useSlideDialog();
 
 ### showDialog(options)
 
-| 参数 | 类型 | 默认值 | 说明 |
-|-----|------|--------|------|
-| title | String | '' | 弹窗标题 |
-| content | String | '' | 弹窗内容 |
-| richText | Boolean | false | 是否为富文本 |
-| iconClose | Boolean | true | 是否显示关闭图标 |
-| tapToClose | Boolean | false | 点击内容区域是否关闭 |
-| type | String | 'bottom' | 弹出位置 |
-| contentHeight | Number | 500 | 内容区域高度（rpx） |
-| maskClick | Boolean | true | 点击遮罩是否关闭 |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| title | String | '' | Dialog title |
+| content | String | '' | Dialog content |
+| richText | Boolean | false | Whether content is rich text |
+| iconClose | Boolean | true | Whether to show close icon |
+| tapToClose | Boolean | false | Whether tapping content area closes dialog |
+| type | String | 'bottom' | Popup position |
+| contentHeight | Number | 500 | Content area height (rpx) |
+| maskClick | Boolean | true | Whether clicking mask closes dialog |
 
 ```javascript
-// 展示用户协议
-showDialog({ title: '用户协议', content: '协议内容...' });
+// Show user agreement
+showDialog({ title: 'User Agreement', content: 'Agreement content...' });
 
-// 展示富文本活动规则
-showDialog({ title: '活动规则', content: '<p>...</p>', richText: true });
+// Show rich text activity rules
+showDialog({ title: 'Activity Rules', content: '<p>...</p>', richText: true });
 ```
 
 ## usePromptDialog
 
-### 引入与初始化
+### Import and Initialize
 
 ```javascript
 import { usePromptDialog } from 'common/composables/usePromptDialog.js';
@@ -121,7 +121,7 @@ import { usePromptDialog } from 'common/composables/usePromptDialog.js';
 const { promptState, showPrompt, handlePromptClick } = usePromptDialog();
 ```
 
-### 模板中定义组件
+### Define Component in Template
 
 ```vue
 <uni-prompt
@@ -135,47 +135,47 @@ const { promptState, showPrompt, handlePromptClick } = usePromptDialog();
 
 ### showPrompt(options)
 
-| 参数 | 类型 | 默认值 | 说明 |
-|-----|------|--------|------|
-| title | String/Boolean | false | 弹窗标题 |
-| content | String/Boolean | false | 弹窗内容 |
-| buttons | Array | [] | 按钮配置数组 |
-| type | String | 'center' | 弹出位置 |
-| maskClick | Boolean | false | 点击遮罩是否关闭 |
-| onClick | Function | - | 按钮点击回调（回调模式） |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| title | String/Boolean | false | Dialog title |
+| content | String/Boolean | false | Dialog content |
+| buttons | Array | [] | Button configuration array |
+| type | String | 'center' | Popup position |
+| maskClick | Boolean | false | Whether clicking mask closes dialog |
+| onClick | Function | - | Button click callback (callback mode) |
 
-**buttons 配置**：`{ text: '按钮文案', type: 'cancel' }`
+**buttons Configuration**: `{ text: 'Button Text', type: 'cancel' }`
 
-**返回值**：
-- 回调模式（传入 onClick）：无返回值
-- Promise 模式（不传 onClick）：返回 `Promise<{ button, index }>`
+**Return Value**:
+- Callback mode (pass onClick): No return value
+- Promise mode (no onClick passed): Returns `Promise<{ button, index }>`
 
 ```javascript
-// 两按钮选择（回调模式）
+// Two-button selection (callback mode)
 showPrompt({
-    title: '提示',
-    content: '确定执行吗？',
-    buttons: [{ text: '取消', type: 'cancel' }, { text: '确认', type: 'confirm' }],
+    title: 'Notice',
+    content: 'Are you sure?',
+    buttons: [{ text: 'Cancel', type: 'cancel' }, { text: 'Confirm', type: 'confirm' }],
     onClick: (button) => { if (button.type === 'confirm') { /* ... */ } },
 });
 
-// Promise 模式
+// Promise mode
 const { button } = await showPrompt({
-    title: '选择支付方式',
-    buttons: [{ text: '微信支付', type: 'wechat' }, { text: '取消', type: 'cancel' }],
+    title: 'Select Payment Method',
+    buttons: [{ text: 'WeChat Pay', type: 'wechat' }, { text: 'Cancel', type: 'cancel' }],
 });
 if (button.type === 'wechat') { /* ... */ }
 ```
 
-## 常见问题
+## FAQ
 
-### 同一页面多业务场景会串吗？
+### Will multiple business scenarios on the same page conflict?
 
-不会。只要业务场景是串行的（用户操作完一个弹窗再操作下一个），同一个组件会根据调用时传入的配置显示不同内容。
+No. As long as business scenarios are sequential (user finishes one dialog before the next), the same component will display different content based on the configuration passed at call time.
 
-### 需要同时显示多个弹窗？
+### Need to show multiple dialogs simultaneously?
 
-创建多个 hook 实例，模板中定义多个组件：
+Create multiple hook instances and define multiple components in the template:
 
 ```javascript
 const deleteAlert = useAlertDialog();

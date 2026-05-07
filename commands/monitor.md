@@ -1,14 +1,14 @@
-# /monitor - 接入监控上报
+# /monitor - Integrate Monitoring & Reporting
 
-## 开发流程
+## Development Workflow
 
-### Step 1: 引入监控 Hook
+### Step 1: Import Monitoring Hook
 
 ```javascript
 import { useMonitorReport } from 'tingyun/index.js';
 ```
 
-### Step 2: 在组件中使用
+### Step 2: Use in Component
 
 ```javascript
 export default {
@@ -19,17 +19,17 @@ export default {
 };
 ```
 
-### Step 3: 按级别上报
+### Step 3: Report by Level
 
-| 级别 | 方法 | 场景 |
-|------|------|------|
-| error | `monitorReport.error()` | 系统错误、异常捕获 |
-| warn | `monitorReport.warn()` | 警告信息、潜在问题 |
-| info | `monitorReport.info()` | 业务关键信息 |
-| debug | `monitorReport.debug()` | 调试信息（开发环境） |
-| log | `monitorReport.log()` | 普通日志 |
+| Level | Method | Scenario |
+|-------|--------|----------|
+| error | `monitorReport.error()` | System errors, exception capture |
+| warn | `monitorReport.warn()` | Warnings, potential issues |
+| info | `monitorReport.info()` | Key business information |
+| debug | `monitorReport.debug()` | Debug info (development only) |
+| log | `monitorReport.log()` | General logging |
 
-### Step 4: 捕获异常
+### Step 4: Capture Exceptions
 
 ```javascript
 try {
@@ -43,13 +43,13 @@ try {
 }
 ```
 
-## 关键约束
+## Key Constraints
 
-1. **上报不阻塞业务**：用 try-catch 包裹监控代码
-2. **高频操作需节流**：滚动、点击等不要频繁上报
-3. **不上报敏感信息**：禁止包含密码、手机号等
-4. **生产环境控制级别**：建议只上报 error 级别
+1. **Reporting must not block business**: Wrap monitoring code in try-catch
+2. **Throttle high-frequency operations**: Don't report frequently for scrolling, clicking, etc.
+3. **No sensitive information**: Never include passwords, phone numbers, etc.
+4. **Control level in production**: Recommend only reporting error level in production
 
-## 详细参考
+## Detailed Reference
 
-→ 读取 [reference/monitor.md](../reference/monitor.md) 获取完整 API、业务监控 Hook 封装、异常类型定义
+→ Read [reference/monitor.md](../reference/monitor.md) for full API, business monitoring hook patterns, exception type definitions
